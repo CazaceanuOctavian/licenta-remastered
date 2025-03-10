@@ -1,6 +1,6 @@
 import re
 import os
-import csv
+import json
 import requests
 import datetime
 import configparser
@@ -33,7 +33,12 @@ config = configparser.ConfigParser()
 config.read('/home/tav/licenta_remastered/cfg.ini')
 
 latest_path = None
+output_file = os.path.join(config['Paths']['vexio_output'], f'vexio_{currentDate}.json')
 
+# Initialize JSON file if it doesn't exist
+if not os.path.exists(output_file):
+    with open(output_file, 'w') as f:
+        json.dump([], f)
 
 def no_nav_strings(iterable):
     return list(filter(lambda x: type(x) != NavigableString, iterable))
@@ -49,14 +54,6 @@ def format_data(item):
             isInStoc = 1
         else:
             isInStoc = 0
-
-        # try:
-        #     price = float(item.find_next(class_='price margin-bottom-xs clearfix col-xs-6 grid-full').text.strip().replace(',','.').split(' ')[0])
-        # except Exception as e:
-        #     #TODO -->fix bug where this gets value of 2.7 instead of 2799 
-        #     price = float(item.find_next(class_='price margin-bottom-xs clearfix col-xs-6 grid-full').text.strip().split('\n')[-1].split(' ')[0].split(',')[0])
-
-        
 
         itemUrl = item.find_parent().findPreviousSibling().a['href']
         #TODO -->fix bug when the first image off of every big page gets skipped 
@@ -89,58 +86,48 @@ def format_data(item):
         for spec, value in zip(product_specification_keys, product_specification_values):
             specification_dict[spec.text.strip()] = value.text.strip()
 
-        #=====scraping image=====   
-        if imageUrl != 'err':
-            try:
-                img_data = requests.get(imageUrl).content
-                img_name = product_code + '.jpeg'
-                #
-                filepath = os.path.join(config['Paths']['image_output'], img_name) 
-                with open(filepath, 'wb') as file:
-                    file.write(img_data)
-            except Exception as e:
-                with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
-                    logs.write('ERR FOR IMAGE SCRAPING: ' + name)
-                    logs.write('ERR: ' + str({e}) + '\n')
-                img_name = 'not_found.jpeg'
+        #=====scraping image===== 
+        # TODO --> Fa sa mearga la un moment dat...  
+        # img_name = 'not_found.jpeg'
+        # if imageUrl != 'err':
+        #     try:
+        #         img_data = requests.get(imageUrl).content
+        #         img_name = product_code + '.jpeg'
+        #         #
+        #         filepath = os.path.join(config['Paths']['image_output'], img_name) 
+        #         with open(filepath, 'wb') as file:
+        #             file.write(img_data)
+        #     except Exception as e:
+        #         with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
+        #             logs.write('ERR FOR IMAGE SCRAPING: ' + name)
+        #             logs.write('ERR: ' + str({e}) + '\n')
         #=====scraping image=====
 
         print('vexio -- ' + name)
 
-        # return {
-        #     'name' : name,
-        #     'raw_price' : price,
-        #     'raw_rating' : -1,
-        #     'is_in_stoc' : isInStoc,
-        #     'url' : itemUrl,
-        #     'product_code' : product_code,
-        #     'online_mag' : 'vexio',
-        #     'img_path' : '/images/' + img_name,
-        #     'manufacturer' : manufacturer
-        #     }
-
-        return {
+        product_data = {
             'timestamp': datetime.datetime.now().strftime('%Y_%m_%d_%H_%M'),
-            'name' : name,
-            'price' : price,
-            'rating' : -1,
+            'name': name,
+            'price': price,
+            'rating': -1,
             'number_of_reviews': 0,
-            'is_in_stoc' : isInStoc,
-            'url' : itemUrl,
-            'product_code' : product_code,
-            'online_mag' : 'vexio',
-            'specifications' : specification_dict,
-            'manufacturer': manufacturer
-            }
+            'is_in_stoc': isInStoc,
+            'url': itemUrl,
+            'product_code': product_code,
+            'online_mag': 'vexio',
+            'specifications': specification_dict,
+            'manufacturer': manufacturer,
+        }
+
+        return product_data
     
     except Exception as e:
         print(str({e}))
-        print('EXCEPTION VEXIO====='+str(name)+str(isInStoc)+'=====EXCEPTION VEXIO')
+        print('EXCEPTION VEXIO====='+str(name if 'name' in locals() else 'unknown')+'=====EXCEPTION VEXIO')
         with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
-            logs.write('ERR IN FORMAT_DATA FOR PRODUCT: ' + name)
+            logs.write('ERR IN FORMAT_DATA FOR PRODUCT: ' + (name if 'name' in locals() else 'unknown'))
             logs.write('ERR: ' + str({e}) + '\n')
-
-    print()
+        return None
 
 def scrape(path : str):
     target_url = path
@@ -169,21 +156,46 @@ def scrape(path : str):
         li_items = soup.find_all(class_="grid-full col-xs-8 col-sm-4 col-md-4")
         category = soup.find(class_='breadcrumb').text.strip().split('\xa0')[-1]
         next_page_button = soup.find(class_ = 'pagination-next')
-
-        with open(config['Paths']['vexio_output'] + 'vexio_' + str(currentDate) + '.csv', 'a', newline='') as scrapefile:
-                writer = csv.writer(scrapefile)
-                for element in li_items:
-                    try:
-                        element = no_nav_strings(element.descendants)
-                        formatted_dict = format_data(element[0])
+        
+        # Process items in batches
+        batch_size = 10
+        for i in range(0, len(li_items), batch_size):
+            batch_items = li_items[i:i + batch_size]
+            batch_data = []
+            
+            for element in batch_items:
+                try:
+                    element = no_nav_strings(element.descendants)
+                    formatted_dict = format_data(element[0])
+                    if formatted_dict:
                         formatted_dict['category'] = category
-
-                        writer.writerow(formatted_dict.values())
-                    except Exception as e:
-                        print(str({e}))
-                        with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
-                            logs.write('ON PATH:' + path +  '\n' + 'PAGE:' + str(current_page) + '\n')
-                        continue
+                        batch_data.append(formatted_dict)
+                except Exception as e:
+                    print(str({e}))
+                    with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
+                        logs.write('ON PATH:' + path +  '\n' + 'PAGE:' + str(current_page) + '\n')
+                        logs.write('ERR: ' + str({e}) + '\n')
+                    continue
+            
+            # Append batch to JSON file if we have data
+            if batch_data:
+                # Read existing data
+                try:
+                    with open(output_file, 'r') as f:
+                        try:
+                            existing_data = json.load(f)
+                        except json.JSONDecodeError:
+                            existing_data = []
+                except FileNotFoundError:
+                    existing_data = []
+                
+                # Append new data and write back
+                existing_data.extend(batch_data)
+                with open(output_file, 'w') as f:
+                    json.dump(existing_data, f, indent=2)
+            
+            # Clear batch data from memory
+            batch_data.clear()
 
         if (next_page_button == None):
             break
@@ -241,5 +253,6 @@ def main():
         os.rename(config['Paths']['vexio_output'] +  'dying_gasp_' + str(currentDate) + '_tmp.txt', config['Paths']['vexio_output'] + 'dying_gasp_' + str(currentDate) + '.txt')
         driver.quit()
 
-main()
-driver.quit()
+if __name__ == "__main__":
+    main()
+    driver.quit()
