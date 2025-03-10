@@ -1,0 +1,10 @@
+ERR FOR IMAGE SCRAPING: Memorie laptop Kingston KVR16S11S6/2, 2GB DDR3 1600MHz, SODIMMERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Dicota Rucsac notebook D30675 ECO 14-15.6 inch cu husa detasabilaERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: ESPERANZA Cooling pad Tivano EA144, 2 ventilatoareERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Memorie laptop Corsair Memorie RAM Value Select, SODIMM, DDR4, 8GB,...ERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Memorie laptop Team Group memorie SODIMM DDR3 1600 mhz 4GB CL 11 EliteERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Geanta laptop cu buzunar, Tableta / eReader, Wenger "SOURCE 16"...ERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Rucsac laptop 600633, Wenger "PILLAR" (EAN:7613329007914), 16 inci,...ERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: Wenger Cobalt backpack 15.6 inch blueERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: ESPERANZA EA148 Lampa notebook cu LED-uri 10ERR: {KeyError('image_output')}
+ERR FOR IMAGE SCRAPING: ESPERANZA Stand notebook de racire 15,6"-17" SAMUM EA141, Iluminate...ERR: {KeyError('image_output')}
