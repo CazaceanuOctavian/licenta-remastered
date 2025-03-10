@@ -1,0 +1,13 @@
+2025-01-23 07:35:29.543 UTC [27275] LOG:  starting PostgreSQL 15.10 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.2.1 20241116, 64-bit
+2025-01-23 07:35:29.544 UTC [27275] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-01-23 07:35:29.544 UTC [27275] LOG:  listening on IPv6 address "::", port 5432
+2025-01-23 07:35:29.548 UTC [27275] LOG:  listening on Unix socket "/home/tav/Desktop/evomag/.nix-shell/db/.s.PGSQL.5432"
+2025-01-23 07:35:29.555 UTC [27279] LOG:  database system was shut down at 2025-01-22 13:01:26 UTC
+2025-01-23 07:35:29.564 UTC [27275] LOG:  database system is ready to accept connections
+2025-01-23 07:35:58.308 UTC [27275] LOG:  received fast shutdown request
+2025-01-23 07:35:58.318 UTC [27275] LOG:  aborting any active transactions
+2025-01-23 07:35:58.319 UTC [27275] LOG:  background worker "logical replication launcher" (PID 27282) exited with exit code 1
+2025-01-23 07:35:58.320 UTC [27277] LOG:  shutting down
+2025-01-23 07:35:58.321 UTC [27277] LOG:  checkpoint starting: shutdown immediate
+2025-01-23 07:35:58.334 UTC [27277] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.015 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB
+2025-01-23 07:35:58.339 UTC [27275] LOG:  database system is shut down

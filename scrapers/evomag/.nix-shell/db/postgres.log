@@ -1,0 +1,10 @@
+2025-01-22 12:37:43.358 UTC [69597] LOG:  redirecting log output to logging collector process
+2025-01-22 12:37:43.358 UTC [69597] HINT:  Future log output will appear in directory "log".
+2025-01-22 12:39:49.155 UTC [79422] LOG:  redirecting log output to logging collector process
+2025-01-22 12:39:49.155 UTC [79422] HINT:  Future log output will appear in directory "log".
+2025-01-22 13:00:01.265 UTC [152862] LOG:  redirecting log output to logging collector process
+2025-01-22 13:00:01.265 UTC [152862] HINT:  Future log output will appear in directory "log".
+2025-01-23 07:35:29.543 UTC [27275] LOG:  redirecting log output to logging collector process
+2025-01-23 07:35:29.543 UTC [27275] HINT:  Future log output will appear in directory "log".
+2025-03-10 12:13:41.445 UTC [206377] LOG:  redirecting log output to logging collector process
+2025-03-10 12:13:41.445 UTC [206377] HINT:  Future log output will appear in directory "log".

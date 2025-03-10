@@ -1,0 +1,8 @@
+2025-03-10 12:13:41.446 UTC [206377] LOG:  starting PostgreSQL 15.12 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.2.1 20241116, 64-bit
+2025-03-10 12:13:41.446 UTC [206377] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-03-10 12:13:41.446 UTC [206377] LOG:  listening on IPv6 address "::", port 5432
+2025-03-10 12:13:41.450 UTC [206377] LOG:  listening on Unix socket "/home/tav/licenta_remastered/scrapers/evomag/.nix-shell/db/.s.PGSQL.5432"
+2025-03-10 12:13:41.471 UTC [206381] LOG:  database system was shut down at 2025-01-23 07:35:58 UTC
+2025-03-10 12:13:41.479 UTC [206377] LOG:  database system is ready to accept connections
+2025-03-10 12:18:41.570 UTC [206379] LOG:  checkpoint starting: time
+2025-03-10 12:18:41.587 UTC [206379] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.002 s, total=0.018 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB
