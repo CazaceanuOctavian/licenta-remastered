@@ -1,0 +1,2 @@
+mongod --dbpath /home/tav/licenta_remastered/env_setup/.mongo/data --port 27017 --bind_ip 127.0.0.1
+mongosh
