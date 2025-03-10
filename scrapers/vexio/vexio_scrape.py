@@ -81,6 +81,14 @@ def format_data(item):
             raw_price = raw_price.replace('.','')
         price = float(raw_price.replace('"','').strip().split(' ')[0].replace(',', '.'))
 
+        specification_dict = {}
+
+        product_specification_keys = other_soup.find_all(class_='char-name')
+        product_specification_values = other_soup.find_all(class_='char-value')
+
+        for spec, value in zip(product_specification_keys, product_specification_values):
+            specification_dict[spec.text.strip()] = value.text.strip()
+
         #=====scraping image=====   
         if imageUrl != 'err':
             try:
@@ -99,16 +107,30 @@ def format_data(item):
 
         print('vexio -- ' + name)
 
+        # return {
+        #     'name' : name,
+        #     'raw_price' : price,
+        #     'raw_rating' : -1,
+        #     'is_in_stoc' : isInStoc,
+        #     'url' : itemUrl,
+        #     'product_code' : product_code,
+        #     'online_mag' : 'vexio',
+        #     'img_path' : '/images/' + img_name,
+        #     'manufacturer' : manufacturer
+        #     }
+
         return {
+            'timestamp': datetime.datetime.now().strftime('%Y_%m_%d_%H_%M'),
             'name' : name,
-            'raw_price' : price,
-            'raw_rating' : -1,
+            'price' : price,
+            'rating' : -1,
+            'number_of_reviews': 0,
             'is_in_stoc' : isInStoc,
             'url' : itemUrl,
             'product_code' : product_code,
             'online_mag' : 'vexio',
-            'img_path' : '/images/' + img_name,
-            'manufacturer' : manufacturer
+            'specifications' : specification_dict,
+            'manufacturer': manufacturer
             }
     
     except Exception as e:
