@@ -2,6 +2,8 @@ scrapers/evomag/output/*
 scrapers/evomag/log/*
 scrapers/evomag/dying_gasp/*
 
+env_setup/.mongo/*
+
 .direnv/
 result/
 
