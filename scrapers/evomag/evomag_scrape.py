@@ -40,7 +40,7 @@ def create_driver():
 currentDate = datetime.datetime.now().strftime('%Y_%m_%d')
 
 config = configparser.ConfigParser()
-config.read('/home/tav/Desktop/evomag/cfg.ini')
+config.read('/home/tav/licenta_remastered/cfg.ini')
 
 latest_path = None
 
