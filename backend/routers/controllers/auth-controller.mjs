@@ -57,10 +57,10 @@ const register = async (req, res, next) => {
   try {
     const passwordHash = await bcrypt.hash(req.body.password, 10)
     
-    const newUser = new User({
+    const newUser = new models.User({
       email: req.body.email,
       passwordHash: passwordHash,
-      type: req.body.type || 'user' // Default user type if not specified
+      type: req.body.type || 'user' 
     })
     
     const savedUser = await newUser.save()
