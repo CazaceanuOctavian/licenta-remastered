@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import User from '../../models/user.mjs'
+import models from '../../models/index.mjs'
 
 const login = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.body.email })
+    const user = await models.User.findOne({ email: req.body.email })
     
     if (user) {
       const isPasswordValid = await bcrypt.compare(req.body.password, user.passwordHash)
@@ -13,7 +13,7 @@ const login = async (req, res, next) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
         
         // Update user with token
-        await User.updateOne(
+        await models.User.updateOne(
           { _id: user._id },
           { token: token }
         )
@@ -24,6 +24,7 @@ const login = async (req, res, next) => {
           id: user._id.toString(), 
           type: user.type 
         })
+
       } else {
         res.status(401).json({ message: 'Invalid email or password' })
       }
