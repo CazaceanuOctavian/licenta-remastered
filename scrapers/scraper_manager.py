@@ -2,6 +2,9 @@ from pymongo import MongoClient
 from configparser import ConfigParser
 import json
 import datetime
+import subprocess
+import signal
+import time
 
 def read_scraper_outputs(output_paths:list[str]):
     products_list = []
@@ -21,6 +24,26 @@ def read_scraper_outputs(output_paths:list[str]):
             print(f"Error processing {path}: {str(e)}")
     return products_list
 
+def scrape_for_interval(script_paths:list[str], cfg:ConfigParser):
+    processes = []
+    signals = []
+    
+    for script in script_paths:
+        process = subprocess.Popen(['python3', script], stdout=None, stderr=subprocess.DEVNULL)
+        processes.append(process)
+        signals.append(process.pid)
+
+    try:
+        time.sleep(int(cfg['Scrapers']['timeout']))
+
+        for process in processes:
+            if process.poll() is None:  
+                process.send_signal(signal.SIGINT)
+
+        print('---- Scraping Ended ----')
+    except Exception as e:
+        print(e)
+
 def main():
     cfg = ConfigParser()
     cfg.read('/home/tav/licenta_remastered/cfg.ini')
@@ -31,11 +54,15 @@ def main():
 
     currentDate = datetime.datetime.now().strftime('%Y_%m_%d')
 
-    paths = [f"{cfg['Paths']['vexio_output']}/vexio_{currentDate}.json", 
-             f"{cfg['Paths']['evomag_output']}/evomag_{currentDate}.json"]
-    
-    scraped_products = read_scraper_outputs(paths)
-    print(scraped_products)
+    script_paths = [cfg['Paths']['vexio_scraper'], 
+                    cfg['Paths']['evomag_scraper']]
+
+    scrape_for_interval(script_paths, cfg)
+
+    output_paths = [f"{cfg['Paths']['vexio_output']}/vexio_{currentDate}.json", 
+                    f"{cfg['Paths']['evomag_output']}/evomag_{currentDate}.json"]
+
+    scraped_products = read_scraper_outputs(output_paths)
 
     collection.insert_many(scraped_products)
 
