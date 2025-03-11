@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import createUserEntity from './user.mjs'
+import createProductEntity from './product.mjs'
 
 dotenv.config()
 
@@ -19,10 +20,12 @@ connectDB()
 
 // Create the models
 const User = createUserEntity()
+const Product = createProductEntity()
 
 export default {
   mongoose,
-  User
+  User,
+  Product
 }
 
 export {
