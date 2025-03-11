@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import User from '../../models/user.model.js' // Update this path to your MongoDB model
+import User from '../../models/user.mjs'
 
 const login = async (req, res, next) => {
   try {
