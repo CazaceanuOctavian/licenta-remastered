@@ -1,11 +1,41 @@
+# Project-specific paths (existing)
 scrapers/evomag/output/*
 scrapers/evomag/log/*
 scrapers/evomag/dying_gasp/*
-
 scrapers/vexio/output/*
-
 env_setup/.mongo/*
-
 .direnv/
 result/
 
+# Node.js specific patterns
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.npm
+.yarn-integrity
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backend specific
+/backend/node_modules/
+/backend/.env
+/backend/dist/
+/backend/build/
+/backend/coverage/
+/backend/logs/
+/backend/.npm
+/backend/.yarn-integrity
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
