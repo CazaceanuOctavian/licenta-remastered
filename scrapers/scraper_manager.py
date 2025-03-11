@@ -27,9 +27,7 @@ def read_scraper_outputs(output_paths:list[str]):
 def scrape_for_interval(script_paths:list[str], cfg:ConfigParser):
     processes = []
     signals = []
-    start_time = time.time()
-    elapsed_time = 0
-
+    
     for script in script_paths:
         process = subprocess.Popen(['python3', script], stdout=None, stderr=subprocess.DEVNULL)
         processes.append(process)
