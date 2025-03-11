@@ -36,9 +36,7 @@ def scrape_for_interval(script_paths:list[str], cfg:ConfigParser):
         signals.append(process.pid)
 
     try:
-        while elapsed_time < cfg['Scrapers']['timeout']:
-            current_time = time.time()
-            elapsed_time = current_time - start_time
+        time.sleep(int(cfg['Scrapers']['timeout']))
 
         for process in processes:
             if process.poll() is None:  
@@ -58,16 +56,17 @@ def main():
 
     currentDate = datetime.datetime.now().strftime('%Y_%m_%d')
 
-    script_paths = [cfg['Paths']['vexio_scraper'], cfg['Paths']['evomag_scraper']]
+    script_paths = [cfg['Paths']['vexio_scraper'], 
+                    cfg['Paths']['evomag_scraper']]
 
-    scrape_for_interval(script_paths)
+    scrape_for_interval(script_paths, cfg)
 
     output_paths = [f"{cfg['Paths']['vexio_output']}/vexio_{currentDate}.json", 
-                f"{cfg['Paths']['evomag_output']}/evomag_{currentDate}.json"]
+                    f"{cfg['Paths']['evomag_output']}/evomag_{currentDate}.json"]
 
-    read_scraper_outputs(output_paths)
+    scraped_products = read_scraper_outputs(output_paths)
 
-    collection.insert_many(output_paths)
+    collection.insert_many(scraped_products)
 
 if __name__ == "__main__":
     main()
