@@ -14,5 +14,6 @@ apiRouter.get('/users',
             controllers.user.fetchAllUsers)
 
 apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
+apiRouter.get('/users/userProductList', middleware.authMiddleware, controllers.userList.getUserListProducts)
 
 export default apiRouter

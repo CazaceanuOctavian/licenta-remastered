@@ -1,6 +1,5 @@
 import models from '../../models/index.mjs'
 
-
 const saveProductToUserList = async (req, res, next) => {
     try {
         const product = await models.Product.findOne({
@@ -12,7 +11,7 @@ const saveProductToUserList = async (req, res, next) => {
         } 
 
         const productAlreadySaved = req.user.savedProducts.some(savedProductCode => 
-            savedProductCode.equals(product.product_code)
+            savedProductCode.toString() === product.product_code.toString()
         );
 
         if (productAlreadySaved) {
@@ -33,8 +32,29 @@ const saveProductToUserList = async (req, res, next) => {
     } catch (err) {
         next(err)
     }
+}   
+
+const getUserListProducts = async (req, res, next) => {
+    try {
+        if (!req.user.savedProducts || req.user.savedProducts.length === 0) {
+            return res.status(200).json({
+                products: []
+            });
+        }
+
+        const savedProducts = await models.Product.find({
+            product_code: { $in: req.user.savedProducts }
+        });
+
+        return res.status(200).json({
+            products: savedProducts
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 export default {
-    saveProductToUserList
+    saveProductToUserList,
+    getUserListProducts
 }
