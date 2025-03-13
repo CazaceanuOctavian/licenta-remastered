@@ -22,6 +22,10 @@ const createUserEntity = () => {
       enum: ['user', 'admin'], // Add any other user types you need
       default: 'user'
     },
+    savedProducts: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    }],
     createdAt: {
       type: Date,
       default: Date.now
