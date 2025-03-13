@@ -1,6 +1,7 @@
 import express from 'express';
 import routers from './routers/index.mjs'
 
+
 const app = express();
 const port = 3000;
 
@@ -8,6 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', routers.auth)
+app.use('/api', routers.api)
 
 // Basic route
 app.get('/', (req, res) => {

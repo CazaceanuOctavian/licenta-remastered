@@ -22,6 +22,11 @@ const createUserEntity = () => {
       enum: ['user', 'admin'], // Add any other user types you need
       default: 'user'
     },
+    savedProducts: [{
+      type: String, // Changed from ObjectId to String to store product_code
+      required: true,
+      trim: true
+    }],
     createdAt: {
       type: Date,
       default: Date.now

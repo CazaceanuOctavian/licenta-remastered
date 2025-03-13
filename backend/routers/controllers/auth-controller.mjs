@@ -12,7 +12,6 @@ const login = async (req, res, next) => {
       if (isPasswordValid) {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
         
-        // Update user with token
         await models.User.updateOne(
           { _id: user._id },
           { token: token }
