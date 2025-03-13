@@ -23,8 +23,9 @@ const createUserEntity = () => {
       default: 'user'
     },
     savedProducts: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product'
+      type: String, // Changed from ObjectId to String to store product_code
+      required: true,
+      trim: true
     }],
     createdAt: {
       type: Date,

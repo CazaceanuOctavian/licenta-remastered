@@ -13,4 +13,6 @@ apiRouter.get('/users',
             middleware.permMiddleware('admin'), 
             controllers.user.fetchAllUsers)
 
+apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
+
 export default apiRouter

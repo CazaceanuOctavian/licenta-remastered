@@ -86,29 +86,6 @@ const getAllProductsFiltered = async (req, res, next) => {
   }
 }
 
-const getProductById = async (req, res, next) => {
-  try {
-    const product = await models.Product.findById(req.params.productId)
-    
-    if (product) {
-      res.status(200).json(product)
-    } else {
-      res.status(404).json({ message: 'Product not found' })
-    }
-  } catch (err) {
-    next(err)
-  }
-}
-
-const createProduct = async (req, res, next) => {
-  try {
-    const product = await models.Product.create(req.body)
-    res.status(201).json(product)
-  } catch (err) {
-    next(err)
-  }
-}
-
 const updateProduct = async (req, res, next) => {
   try {
     const product = await models.Product.findByIdAndUpdate(
@@ -143,8 +120,6 @@ const deleteProduct = async (req, res, next) => {
 
 export default {
   getAllProductsFiltered,
-  getProductById,
-  createProduct,
   updateProduct,
   deleteProduct
 }
