@@ -54,7 +54,39 @@ const getUserListProducts = async (req, res, next) => {
     }
 }
 
+const deleteProductFromUserList = async (req, res, next) => {
+    try {
+        const productCode = req.params.pcode;
+        
+        if (!productCode) {
+            return res.status(400).json({ message: 'Product code is required' });
+        }
+
+        const productInUserList = req.user.savedProducts.some(savedProductCode => 
+            savedProductCode.toString() === productCode.toString()
+        );
+
+        if (!productInUserList) {
+            return res.status(400).json({ message: 'Product not in user list' });
+        }
+
+        req.user.savedProducts = req.user.savedProducts.filter(savedProductCode => 
+            savedProductCode.toString() !== productCode.toString()
+        );
+
+        await req.user.save();
+
+        return res.status(200).json({ 
+            message: 'Product removed from saved list',
+            productCode: productCode
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 export default {
     saveProductToUserList,
-    getUserListProducts
+    getUserListProducts,
+    deleteProductFromUserList
 }

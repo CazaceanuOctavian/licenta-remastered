@@ -7,13 +7,16 @@ const apiRouter = express.Router()
 //PRODUCTS
 apiRouter.get('/products', controllers.product.getAllProductsFiltered)
 
+//USER PRODUCT LIST
+apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
+apiRouter.delete('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.deleteProductFromUserList)
+apiRouter.get('/users/userProductList', middleware.authMiddleware, controllers.userList.getUserListProducts)
+
 //USERS
 apiRouter.get('/users', 
             middleware.authMiddleware, 
             middleware.permMiddleware('admin'), 
             controllers.user.fetchAllUsers)
 
-apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
-apiRouter.get('/users/userProductList', middleware.authMiddleware, controllers.userList.getUserListProducts)
 
 export default apiRouter
