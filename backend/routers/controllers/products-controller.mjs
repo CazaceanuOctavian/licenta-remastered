@@ -21,6 +21,10 @@ const getAllProductsFiltered = async (req, res, next) => {
         filterConditions.$and = nameRegexPatterns;
       }
     }
+
+    if (req.query.productCode) {
+      filterConditions.product_code = req.query.productCode
+    }
     
     // Filter by manufacturer
     if (req.query.manufacturer) {
