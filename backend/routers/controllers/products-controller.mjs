@@ -68,6 +68,11 @@ const getAllProductsFiltered = async (req, res, next) => {
       query = query.skip(pageSize * pageNumber).limit(pageSize)
     }
     
+    // Determine projection (fields to include/exclude)
+    if (req.query.extendedProduct && req.query.extendedProduct === 'false') {
+      query = query.select('-specifications')
+    }
+    
     // Execute query
     const products = await query.exec()
     
