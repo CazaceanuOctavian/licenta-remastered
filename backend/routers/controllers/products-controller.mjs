@@ -1,6 +1,6 @@
 import models from "../../models/index.mjs"
 
-const getAllProducts = async (req, res, next) => {
+const getAllProductsFiltered = async (req, res, next) => {
   try {
     // Start building the query
     let query = models.Product.find()
@@ -133,7 +133,7 @@ const deleteProduct = async (req, res, next) => {
 }
 
 export default {
-  getAllProducts,
+  getAllProductsFiltered,
   getProductById,
   createProduct,
   updateProduct,
