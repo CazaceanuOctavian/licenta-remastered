@@ -1,4 +1,3 @@
-
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react';
 
@@ -7,6 +6,9 @@ import AppContext from '../../state/AppContext';
 //STORES
 import ProductStore from '../../state/stores/ProductStore';
 import UserStore from '../../state/stores/UserStore';
+
+import LoginForm from '../LoginForm/LoginForm';
+import RegisterForm from '../RegisterForm/RegisterForm';
 
 
 const App = () => {
@@ -41,12 +43,16 @@ const App = () => {
         <Routes>
           <Route path='/' element= {
             <div>hellow world!</div>
-          }
-          />
-           <Route path='/products' element= {
+          } />
+          <Route path='/login' element= {
+            <LoginForm />
+          } />
+          <Route path='/register' element= {
+            <RegisterForm />
+          } />
+          <Route path='/products' element= {
             <div>hellow products!</div>
-          }
-          />
+          } />
         </Routes>
       </Router>
 
