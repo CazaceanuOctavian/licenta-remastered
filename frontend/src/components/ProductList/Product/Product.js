@@ -1,5 +1,5 @@
 import React from 'react';
-import './ProductComponent.css';
+import './Product.css';
 
 const Product = ({ product }) => {
   const { name, manufacturer, price, specifications, is_in_stoc } = product;
