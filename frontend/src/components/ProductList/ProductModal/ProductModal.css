@@ -208,6 +208,7 @@
     transition: transform 0.2s, box-shadow 0.2s;
     background-color: #f9f9f9;
     cursor: pointer;
+    position: relative;
   }
   
   /* Price comparison styles */
@@ -232,6 +233,28 @@
   .related-product-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* View product hint */
+  .view-product-hint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(25, 118, 210, 0.85);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .related-product-card:hover .view-product-hint {
+    opacity: 1;
   }
   
   .related-product-name {
@@ -339,6 +362,16 @@
   
   .close-btn:hover {
     background-color: #f5f5f5;
+  }
+  
+  /* Animation for product switching */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    animation: fadeIn 0.3s ease-in-out;
   }
   
   @media (max-width: 600px) {

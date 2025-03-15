@@ -3,16 +3,32 @@ import AppContext from '../../../state/AppContext';
 import { SERVER } from '../../../config/global';
 import './ProductModal.css';
 
-const ProductModal = ({ product, onClose }) => {
+const ProductModal = ({ product: initialProduct, onClose }) => {
+  // State to track the currently displayed product
+  const [currentProduct, setCurrentProduct] = useState(initialProduct);
+  // State to track related products
   const [relatedProducts, setRelatedProducts] = useState([]);
+  // Loading state
   const [loading, setLoading] = useState(false);
+  // Keep track of all products we've seen to avoid duplicate fetches
+  const [allProducts, setAllProducts] = useState({});
 
-  // Fetch related products when the modal opens
+  // Initialize allProducts with the initial product
+  useEffect(() => {
+    if (initialProduct) {
+      setAllProducts(prev => ({
+        ...prev,
+        [initialProduct.id || initialProduct._id]: initialProduct
+      }));
+    }
+  }, [initialProduct]);
+
+  // Fetch related products when the current product changes
   useEffect(() => {
     // Only proceed if we have a product
-    if (!product) return;
+    if (!currentProduct) return;
 
-    const currentProductCode = product.product_code;
+    const currentProductCode = currentProduct.product_code;
     console.log('Current product code:', currentProductCode);
     
     if (!currentProductCode) {
@@ -43,13 +59,24 @@ const ProductModal = ({ product, onClose }) => {
         }
         
         // Filter out the current product by id
-        const currentId = product.id || product._id;
+        const currentId = currentProduct.id || currentProduct._id;
         const related = content.data.filter(item => {
           const itemId = item.id || item._id;
           return itemId !== currentId;
         });
         
         console.log('Related products after filtering:', related);
+        
+        // Update the allProducts with new related products
+        const productsMap = { ...allProducts };
+        related.forEach(product => {
+          const productId = product.id || product._id;
+          if (!productsMap[productId]) {
+            productsMap[productId] = product;
+          }
+        });
+        
+        setAllProducts(productsMap);
         setRelatedProducts(related);
         setLoading(false);
       } catch (error) {
@@ -60,25 +87,36 @@ const ProductModal = ({ product, onClose }) => {
     
     fetchRelatedProducts();
     
-    // No cleanup needed for this effect
-  }, [product]); // Dependency on product to refetch if product changes
+  }, [currentProduct]); // Dependency on currentProduct to refetch when it changes
+
+  // Handle switching to a related product
+  const handleProductSwitch = (productId) => {
+    // Find the product in our cached products
+    const newMainProduct = allProducts[productId];
+    
+    if (newMainProduct) {
+      // Set the clicked product as the main product
+      setCurrentProduct(newMainProduct);
+      // Loading state will be handled by the useEffect
+    }
+  };
 
   // Helper function to determine price comparison class
   const getPriceComparisonClass = (relatedProductPrice) => {
-    if (!product || !product.price || !relatedProductPrice) return '';
+    if (!currentProduct || !currentProduct.price || !relatedProductPrice) return '';
     
-    const currentPrice = parseFloat(product.price);
+    const mainPrice = parseFloat(currentProduct.price);
     const comparisonPrice = parseFloat(relatedProductPrice);
     
-    if (comparisonPrice < currentPrice) return 'lower-price';
-    if (comparisonPrice > currentPrice) return 'higher-price';
+    if (comparisonPrice < mainPrice) return 'lower-price';
+    if (comparisonPrice > mainPrice) return 'higher-price';
     return '';
   };
 
   // Early return if no product
-  if (!product) return null;
+  if (!currentProduct) return null;
 
-  // Destructure product properties
+  // Destructure current product properties
   const { 
     name, 
     manufacturer, 
@@ -87,7 +125,7 @@ const ProductModal = ({ product, onClose }) => {
     is_in_stoc, 
     description, 
     product_code
-  } = product;
+  } = currentProduct;
 
   return (
     <div className="product-modal-overlay" onClick={(e) => {
@@ -161,25 +199,30 @@ const ProductModal = ({ product, onClose }) => {
                   </div>
                 </div>
                 <div className="related-products-grid">
-                  {relatedProducts.map((relatedProduct) => (
-                    <div 
-                      className={`related-product-card ${getPriceComparisonClass(relatedProduct.price)}`} 
-                      key={relatedProduct.id || relatedProduct._id}
-                    >
-                      <div className="related-product-name">{relatedProduct.name}</div>
-                      <div className="related-product-info">
-                        <div className="related-product-price">{relatedProduct.price?.toFixed(2)} RON</div>
-                        <div className={`related-product-stock ${relatedProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
-                          {relatedProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
+                  {relatedProducts.map((relatedProduct) => {
+                    const productId = relatedProduct.id || relatedProduct._id;
+                    return (
+                      <div 
+                        className={`related-product-card ${getPriceComparisonClass(relatedProduct.price)}`} 
+                        key={productId}
+                        onClick={() => handleProductSwitch(productId)}
+                      >
+                        <div className="related-product-name">{relatedProduct.name}</div>
+                        <div className="related-product-info">
+                          <div className="related-product-price">{relatedProduct.price?.toFixed(2)} RON</div>
+                          <div className={`related-product-stock ${relatedProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
+                            {relatedProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
+                          </div>
                         </div>
+                        {Object.entries(relatedProduct.specifications || {}).slice(0, 3).map(([key, value]) => (
+                          <div className="related-product-spec" key={key}>
+                            <span className="related-spec-name">{key}:</span> {value}
+                          </div>
+                        ))}
+                        <div className="view-product-hint">Click to view this product</div>
                       </div>
-                      {Object.entries(relatedProduct.specifications || {}).slice(0, 3).map(([key, value]) => (
-                        <div className="related-product-spec" key={key}>
-                          <span className="related-spec-name">{key}:</span> {value}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             ) : (
