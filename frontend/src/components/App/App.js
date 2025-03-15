@@ -17,6 +17,33 @@ const App = () => {
   const [userStore] = useState(new UserStore())
   const [productStore] = useState(new ProductStore())
 
+  //DATA PERSISTENCE THROUGH LocalStoradge
+  useEffect(() => {
+    userStore.emitter.addListener('LOGIN_SUCCESS', () => {
+      // Save user data to localStorage when login is successful
+      localStorage.setItem('user', JSON.stringify(userStore.data));
+      setIsAuthenticated(true);
+    });
+
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        //!! Put data in the userStore class for passing on to context
+        userStore.data = userData;
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        localStorage.removeItem('user');
+      }
+    }
+  }, [userStore])
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    userStore.data = {};
+    setIsAuthenticated(false);
+  };
 
   return (
     <AppContext.Provider value={{
@@ -30,10 +57,7 @@ const App = () => {
               <h5>Welcome, {userStore.data.email}</h5>
             </div>
             <div>
-              <button onClick={() => {
-                userStore.logout()
-                setIsAuthenticated(false)
-              }}
+              <button onClick={handleLogout}
               >Logout
               </button>
             </div>
@@ -56,8 +80,6 @@ const App = () => {
           } />
         </Routes>
       </Router>
-
-
     </AppContext.Provider>
   )
 }
