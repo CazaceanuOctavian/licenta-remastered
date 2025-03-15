@@ -11,7 +11,7 @@ const UserFetchDetailsForm = () => {
                 user email: {globalState.user.data && globalState.user.data.email ? globalState.user.data.email : "INVALID USER"}
             </p>
             <p>
-                user password: {globalState.user.data && globalState.user.data.token ? globalState.user.data.token : "INVALID TOKEN"}
+                user token: {globalState.user.data && globalState.user.data.token ? globalState.user.data.token : "INVALID TOKEN"}
             </p>
             <p>
                 user id: {globalState.user.data && globalState.user.data.id ? globalState.user.data.id : "INVALID TOKEN"}

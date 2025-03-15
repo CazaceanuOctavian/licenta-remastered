@@ -4,9 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import './RegisterForm.css' // We'll use the same styling approach
 
 const RegisterForm = () => {
-  const [isRegistered, setIsRegistered] = useState(false)
   const { user } = useContext(AppContext)
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')
@@ -30,33 +28,6 @@ const RegisterForm = () => {
       return false
     }
     
-    // Here you would typically make an API call to check if the email exists
-    // For this example, we'll simulate checking for existing emails
-    const checkEmailExists = async () => {
-      try {
-        // This would be your actual API call
-        // const response = await fetch('/api/check-email', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ email })
-        // });
-        // const data = await response.json();
-        
-        // For demo purposes, let's pretend some emails are already taken
-        const existingEmails = ['test@example.com', 'user@domain.com', 'admin@site.com']
-        return existingEmails.includes(email.toLowerCase())
-      } catch (error) {
-        console.error('Error checking email:', error)
-        return false
-      }
-    }
-    
-    // If the email exists, show an error
-    if (checkEmailExists()) {
-      setEmailError('This email is already registered')
-      return false
-    }
-    
     setEmailError('')
     return true
   }
@@ -72,8 +43,8 @@ const RegisterForm = () => {
       return false
     }
     
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters')
+    if (password.length < 5) {
+      setPasswordError('Password must be at least 5 characters')
       return false
     }
     
@@ -86,7 +57,7 @@ const RegisterForm = () => {
     const isPasswordValid = validatePasswords()
     
     if (isEmailValid && isPasswordValid) {
-      user.register(name, email, password)
+      user.register(email, password)
     }
   }
   
@@ -99,7 +70,6 @@ const RegisterForm = () => {
 
   useEffect(() => {
     user.emitter.addListener('REGISTER_SUCCESS', () => {
-      setIsRegistered(true)
       navigate(location.state?.from || '/login')
     })
   }, [])

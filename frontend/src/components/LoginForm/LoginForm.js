@@ -28,33 +28,6 @@ const LoginForm = () => {
       return false
     }
     
-    // // Here you would typically make an API call to check if the email exists
-    // // For this example, we'll simulate checking for existing emails
-    // const checkEmailExists = async () => {
-    //   try {
-    //     // This would be your actual API call
-    //     // const response = await fetch('/api/check-email', {
-    //     //   method: 'POST',
-    //     //   headers: { 'Content-Type': 'application/json' },
-    //     //   body: JSON.stringify({ email })
-    //     // });
-    //     // const data = await response.json();
-        
-    //     // For demo purposes, let's pretend some emails are in our system
-    //     const knownEmails = ['test@example.com', 'user@domain.com', 'admin@site.com']
-    //     return knownEmails.includes(email.toLowerCase())
-    //   } catch (error) {
-    //     console.error('Error checking email:', error)
-    //     return false
-    //   }
-    // }
-    
-    // // For login, we want to check if the email exists (opposite of registration check)
-    // if (!checkEmailExists()) {
-    //   setEmailError('Email not found. Please check your email or register')
-    //   return false
-    // }
-    
     setEmailError('')
     return true
   }
