@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AppContext from '../../../state/AppContext';
 import { SERVER } from '../../../config/global';
 import './ProductModal.css';
@@ -12,6 +13,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [loading, setLoading] = useState(false);
   // Keep track of all products we've seen to avoid duplicate fetches
   const [allProducts, setAllProducts] = useState({});
+  // Processed price history data for the chart
+  const [priceHistoryData, setPriceHistoryData] = useState([]);
+  // State to track if we need to fetch the full product details
+  const [loadingFullProduct, setLoadingFullProduct] = useState(false);
 
   // Initialize allProducts with the initial product
   useEffect(() => {
@@ -20,8 +25,85 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         ...prev,
         [initialProduct.id || initialProduct._id]: initialProduct
       }));
+      
+      // Check if we need to fetch the full product (including price history)
+      if (!initialProduct.price_history) {
+        fetchFullProductDetails(initialProduct.id || initialProduct._id);
+      }
     }
   }, [initialProduct]);
+
+  // Function to fetch full product details with price history
+  const fetchFullProductDetails = async (productId) => {
+    try {
+      setLoadingFullProduct(true);
+      console.log('Fetching full product details for product ID:', productId);
+      
+      const response = await fetch(`${SERVER}/api/products/${productId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch product details: ${response.status}`);
+      }
+      
+      const productData = await response.json();
+      console.log('Full product details received:', productData);
+      
+      if (productData) {
+        // Update the current product with full details
+        setCurrentProduct(productData);
+        
+        // Also update the product in allProducts
+        setAllProducts(prev => ({
+          ...prev,
+          [productId]: productData
+        }));
+      }
+      
+      setLoadingFullProduct(false);
+    } catch (error) {
+      console.error('Error fetching full product details:', error);
+      setLoadingFullProduct(false);
+    }
+  };
+
+  // Process price history data when current product changes
+  useEffect(() => {
+    if (!currentProduct || !currentProduct.price_history || !Array.isArray(currentProduct.price_history)) {
+      setPriceHistoryData([]);
+      return;
+    }
+
+    // Sort price history by timestamp (oldest to newest)
+    const sortedHistory = [...currentProduct.price_history].sort((a, b) => {
+      // Parse timestamps for comparison
+      return a.timestamp.localeCompare(b.timestamp);
+    });
+
+    // Format data for the chart
+    const formattedData = sortedHistory.map(entry => {
+      // Parse timestamp format: "2025_03_13_21_01"
+      try {
+        const [year, month, day, hour, minute] = entry.timestamp.split('_');
+        const dateLabel = `${month}/${day} ${hour}:${minute}`;
+        
+        return {
+          date: dateLabel,
+          price: entry.price,
+          // Store original timestamp for tooltip
+          fullTimestamp: `${year}-${month}-${day} ${hour}:${minute}`
+        };
+      } catch (error) {
+        console.error('Error parsing timestamp:', entry.timestamp, error);
+        return {
+          date: 'Unknown',
+          price: entry.price,
+          fullTimestamp: 'Invalid date'
+        };
+      }
+    });
+
+    setPriceHistoryData(formattedData);
+  }, [currentProduct]);
 
   // Fetch related products when the current product changes
   useEffect(() => {
@@ -97,7 +179,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     if (newMainProduct) {
       // Set the clicked product as the main product
       setCurrentProduct(newMainProduct);
-      // Loading state will be handled by the useEffect
+      
+      // Check if we need to fetch full details for this product
+      if (!newMainProduct.price_history) {
+        fetchFullProductDetails(productId);
+      }
     }
   };
 
@@ -113,6 +199,27 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     return '';
   };
 
+  // Format price for display in chart tooltip
+  const formatPrice = (value) => {
+    return `${value.toFixed(2)} RON`;
+  };
+
+  // Calculate min and max y-axis values
+  const getYAxisDomain = () => {
+    if (!priceHistoryData.length) return [0, 0];
+    
+    const prices = priceHistoryData.map(item => item.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    
+    // Add 5% padding to top and bottom
+    const padding = (max - min) * 0.05;
+    return [
+      Math.max(0, min - padding), // Don't go below 0
+      max + padding
+    ];
+  };
+
   // Early return if no product
   if (!currentProduct) return null;
 
@@ -126,6 +233,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     description, 
     product_code
   } = currentProduct;
+
+  // Calculate y-axis domain
+  const yAxisDomain = getYAxisDomain();
 
   return (
     <div className="product-modal-overlay" onClick={(e) => {
@@ -177,6 +287,78 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
               </table>
             </div>
           )}
+          
+          {/* Price History Chart */}
+          <div className="modal-price-history">
+            <h3>Price History</h3>
+            {loadingFullProduct ? (
+              <div className="loading-price-history">Loading price history data...</div>
+            ) : priceHistoryData.length > 0 ? (
+              <div className="price-chart-container">
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart
+                    data={priceHistoryData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="date" 
+                      label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }} 
+                    />
+                    <YAxis 
+                      domain={yAxisDomain}
+                      label={{ value: 'Price (RON)', angle: -90, position: 'insideLeft' }} 
+                      tickFormatter={formatPrice}
+                    />
+                    <Tooltip 
+                      formatter={(value) => [`${value.toFixed(2)} RON`, 'Price']}
+                      labelFormatter={(label, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Date: ${payload[0].payload.fullTimestamp}`;
+                        }
+                        return label;
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="price" 
+                      stroke="#1976d2" 
+                      activeDot={{ r: 8 }} 
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+                <div className="price-history-summary">
+                  {priceHistoryData.length > 1 && (
+                    <>
+                      <div className="price-history-stat">
+                        <span>Lowest Price:</span> 
+                        <span className="price-value lower-price">
+                          {Math.min(...priceHistoryData.map(item => item.price)).toFixed(2)} RON
+                        </span>
+                      </div>
+                      <div className="price-history-stat">
+                        <span>Highest Price:</span> 
+                        <span className="price-value higher-price">
+                          {Math.max(...priceHistoryData.map(item => item.price)).toFixed(2)} RON
+                        </span>
+                      </div>
+                      <div className="price-history-stat">
+                        <span>Price Changes:</span> 
+                        <span className="price-value">
+                          {new Set(priceHistoryData.map(item => item.price)).size - 1}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="no-price-history">
+                No price history available for this product.
+              </div>
+            )}
+          </div>
           
           <div className="modal-related-products">
             <h3>Related Products {product_code ? `(Code: ${product_code})` : ''}</h3>
