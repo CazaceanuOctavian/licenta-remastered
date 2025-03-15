@@ -443,3 +443,81 @@
       align-items: center;
     }
   }
+
+  .loading-price-history {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    position: relative;
+  }
+  
+  .loading-price-history::after {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1976d2;
+    animation: spin 1s linear infinite;
+    margin-top: -40px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .product-modal {
+    background-color: white;
+    border-radius: 8px;
+    width: 95%; /* Increased from 90% */
+    max-width: 1200px; /* Increased from 800px */
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Make the price chart container larger */
+  .price-chart-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px; /* Increased padding */
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+  }
+  
+  /* Increase height of the chart */
+  .price-chart-container .recharts-responsive-container {
+    height: 300px !important; /* Increased from 250px */
+  }
+  
+  /* Make the specifications table more readable with the extra space */
+  .modal-specifications table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.05rem; /* Slightly larger text */
+  }
+  
+  .modal-specifications td {
+    padding: 10px 15px; /* Increased padding */
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Improve the layout for the related products grid with more space */
+  .related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Wider cards */
+    gap: 20px; /* Increased gap */
+  }
+  
+  /* Add this to your existing CSS file */
