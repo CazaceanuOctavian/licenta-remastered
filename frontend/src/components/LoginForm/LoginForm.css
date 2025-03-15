@@ -65,6 +65,7 @@
   /* Input styling */
   .input-group {
     margin-bottom: 1.5rem;
+    position: relative;
   }
   
   .input-group label {
@@ -90,8 +91,25 @@
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
   }
   
+  /* Error state styling */
+  .input-group input.input-error {
+    border-color: var(--error-color);
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+  
+  .input-group input.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  }
+  
   .input-group input::placeholder {
     color: #9ca3af;
+  }
+  
+  /* Error message styling */
+  .error-message {
+    color: var(--error-color);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
   }
   
   /* Form footer */
