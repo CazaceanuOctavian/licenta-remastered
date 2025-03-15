@@ -10,6 +10,7 @@ import UserStore from '../../state/stores/UserStore';
 import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
 import UserFetchDetailsForm from '../UserFetchDetailsForm/UserFetchDetailsForm';
+import ProductList from '../ProductList/ProductList';
 
 
 const App = () => {
@@ -76,7 +77,7 @@ const App = () => {
             <RegisterForm />
           } />
           <Route path='/products' element= {
-            <div>hellow products!</div>
+            <ProductList />
           } />
         </Routes>
       </Router>
