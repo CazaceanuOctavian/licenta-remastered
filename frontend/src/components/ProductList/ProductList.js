@@ -4,6 +4,10 @@ import Product from "./Product/Product" // Import the Product component
 import './ProductList.css'
 
 const ProductList = () => {
+    //TODO --> FIX PAGINATION
+            // FIX MANUFACTURER --> Fa-l sa apara doar dupa ce s-au cautat deja produse...
+
+
     const globalState = useContext(AppContext)
     const [products, setProducts] = useState([])
     //FILTER PARAMS
@@ -25,11 +29,6 @@ const ProductList = () => {
 
         // Add listener for successful product fetch
         globalState.product.emitter.addListener('PRODUCT_GET_ALL_SUCCESS', handleProductsFetched)
-
-        // Clean up listener on component unmount
-        return () => {
-            globalState.product.emitter.removeListener('PRODUCT_GET_ALL_SUCCESS', handleProductsFetched)
-        }
     }, [])
 
     const fetchProducts = () => {
@@ -113,8 +112,8 @@ const ProductList = () => {
                         onChange={(e) => setSortOrder(e.target.value)}
                     >
                         <option value="">Order</option>
-                        <option value="asc">Ascending</option>
-                        <option value="desc">Descending</option>
+                        <option value="ASC">Ascending</option>
+                        <option value="DESC">Descending</option>
                     </select>
                     
                     <select 
