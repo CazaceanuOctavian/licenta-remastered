@@ -1,0 +1,210 @@
+/* ProductList.css */
+
+.product-list-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .product-list-container h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  /* New layout with sidebar and content area */
+  .content-layout {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  /* Filters Sidebar */
+  .filters-sidebar {
+    flex: 0 0 250px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    align-self: flex-start;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  
+  .filters-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
+    font-size: 1.2rem;
+    color: #333;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.8rem;
+  }
+  
+  .filter-inputs {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .filter-item label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .filter-item input,
+  .filter-item select {
+    padding: 0.65rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .filter-item input:focus,
+  .filter-item select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    outline: none;
+  }
+  
+  .apply-filters-btn {
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+  }
+  
+  .apply-filters-btn:hover {
+    background-color: #3a7bc8;
+  }
+  
+  /* Products Content Area */
+  .products-content {
+    flex: 1;
+    min-width: 0; /* Prevents flex item from overflowing */
+  }
+  
+  /* Products Grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Loading & Empty States */
+  .loading, .no-products {
+    text-align: center;
+    padding: 3rem 0;
+    color: #666;
+    font-size: 1.1rem;
+  }
+  
+  .loading {
+    position: relative;
+  }
+  
+  .loading:after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #4a90e2;
+    border-radius: 50%;
+    margin: 1rem auto;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .pagination button {
+    padding: 0.6rem 1.2rem;
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .pagination button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+  }
+  
+  .pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination span {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 900px) {
+    .content-layout {
+      flex-direction: column;
+    }
+    
+    .filters-sidebar {
+      flex: none;
+      width: 100%;
+      position: static;
+      max-height: none;
+      margin-bottom: 1.5rem;
+    }
+    
+    .filter-inputs {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .product-list-container {
+      padding: 1rem;
+    }
+    
+    .filter-inputs {
+      grid-template-columns: 1fr;
+    }
+    
+    .products-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .products-grid {
+      grid-template-columns: 1fr;
+    }
+  }

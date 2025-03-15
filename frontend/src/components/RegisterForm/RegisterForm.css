@@ -1,0 +1,207 @@
+/* RegisterForm.css - mostly inherits from LoginForm.css */
+/* We can either import the LoginForm.css or duplicate the styles */
+/* For simplicity, I'll include the full styles here */
+
+/* Modern variables for consistent theming */
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --text-color: #374151;
+    --text-light: #6b7280;
+    --background-color: #f9fafb;
+    --card-background: #ffffff;
+    --border-color: #e5e7eb;
+    --error-color: #ef4444;
+    --success-color: #10b981;
+    --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --transition: all 0.3s ease;
+  }
+  
+  /* Base styling */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 1.5;
+  }
+  
+  /* Login page layout */
+  .login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+  }
+  
+  .login-form {
+    width: 100%;
+    max-width: 420px;
+  }
+  
+  .form-container {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--box-shadow);
+    padding: 2.5rem;
+    transition: var(--transition);
+  }
+  
+  /* Form header */
+  .form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-subtitle {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+  }
+  
+  /* Input styling */
+  .input-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .input-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-background);
+    transition: var(--transition);
+  }
+  
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  }
+  
+  /* Error state styling */
+  .input-group input.input-error {
+    border-color: var(--error-color);
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+  
+  .input-group input.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  }
+  
+  .input-group input::placeholder {
+    color: #9ca3af;
+  }
+  
+  /* Error message styling */
+  .error-message {
+    color: var(--error-color);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Form footer */
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Terms agreement styling */
+  .terms-agreement {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .terms-agreement input[type="checkbox"] {
+    margin-right: 0.5rem;
+    margin-top: 0.25rem;
+    accent-color: var(--primary-color);
+  }
+  
+  .terms-agreement label {
+    color: var(--text-light);
+  }
+  
+  .terms-agreement a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+  
+  .terms-agreement a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Button styling */
+  .login-button {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .login-button:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  .login-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+  }
+  
+  /* Sign in link */
+  .signup-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+  
+  .signup-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  
+  .signup-link a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .form-container {
+      padding: 1.75rem;
+    }
+    
+    .form-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+  }

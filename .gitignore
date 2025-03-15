@@ -30,6 +30,16 @@ yarn-error.log
 /backend/.npm
 /backend/.yarn-integrity
 
+# Frontend specific
+/frontend/node_modules/
+/frontend/.env
+/frontend/dist/
+/frontend/build/
+/frontend/coverage/
+/frontend/logs/
+/frontend/.npm
+/frontend/.yarn-integrity
+
 # OS specific files
 .DS_Store
 Thumbs.db
