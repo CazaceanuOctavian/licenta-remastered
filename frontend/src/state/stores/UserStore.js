@@ -20,6 +20,7 @@ class UserStore {
               })
         })
         if (!response.ok) {
+            this.emitter.emit('REGISTER_ERROR_EMAIL_EXISTS')
             throw response
         }
         this.data = await response.json()

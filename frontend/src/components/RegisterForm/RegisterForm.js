@@ -72,6 +72,9 @@ const RegisterForm = () => {
     user.emitter.addListener('REGISTER_SUCCESS', () => {
       navigate(location.state?.from || '/login')
     })
+    user.emitter.addListener('REGISTER_ERROR_EMAIL_EXISTS', () => {
+        setEmailError('User already exists!')
+    })
   }, [])
 
   return (
