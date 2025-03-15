@@ -63,6 +63,18 @@ const ProductModal = ({ product, onClose }) => {
     // No cleanup needed for this effect
   }, [product]); // Dependency on product to refetch if product changes
 
+  // Helper function to determine price comparison class
+  const getPriceComparisonClass = (relatedProductPrice) => {
+    if (!product || !product.price || !relatedProductPrice) return '';
+    
+    const currentPrice = parseFloat(product.price);
+    const comparisonPrice = parseFloat(relatedProductPrice);
+    
+    if (comparisonPrice < currentPrice) return 'lower-price';
+    if (comparisonPrice > currentPrice) return 'higher-price';
+    return '';
+  };
+
   // Early return if no product
   if (!product) return null;
 
@@ -133,24 +145,43 @@ const ProductModal = ({ product, onClose }) => {
             {loading ? (
               <div className="related-loading">Loading related products...</div>
             ) : relatedProducts.length > 0 ? (
-              <div className="related-products-grid">
-                {relatedProducts.map((relatedProduct) => (
-                  <div className="related-product-card" key={relatedProduct.id || relatedProduct._id}>
-                    <div className="related-product-name">{relatedProduct.name}</div>
-                    <div className="related-product-info">
-                      <div className="related-product-price">{relatedProduct.price?.toFixed(2)} RON</div>
-                      <div className={`related-product-stock ${relatedProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
-                        {relatedProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
-                      </div>
-                    </div>
-                    {Object.entries(relatedProduct.specifications || {}).slice(0, 3).map(([key, value]) => (
-                      <div className="related-product-spec" key={key}>
-                        <span className="related-spec-name">{key}:</span> {value}
-                      </div>
-                    ))}
+              <>
+                <div className="price-comparison-legend">
+                  <div className="price-legend-item">
+                    <span className="price-indicator lower-price-indicator"></span>
+                    <span>Lower price than current product</span>
                   </div>
-                ))}
-              </div>
+                  <div className="price-legend-item">
+                    <span className="price-indicator same-price-indicator"></span>
+                    <span>Same price as current product</span>
+                  </div>
+                  <div className="price-legend-item">
+                    <span className="price-indicator higher-price-indicator"></span>
+                    <span>Higher price than current product</span>
+                  </div>
+                </div>
+                <div className="related-products-grid">
+                  {relatedProducts.map((relatedProduct) => (
+                    <div 
+                      className={`related-product-card ${getPriceComparisonClass(relatedProduct.price)}`} 
+                      key={relatedProduct.id || relatedProduct._id}
+                    >
+                      <div className="related-product-name">{relatedProduct.name}</div>
+                      <div className="related-product-info">
+                        <div className="related-product-price">{relatedProduct.price?.toFixed(2)} RON</div>
+                        <div className={`related-product-stock ${relatedProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
+                          {relatedProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
+                        </div>
+                      </div>
+                      {Object.entries(relatedProduct.specifications || {}).slice(0, 3).map(([key, value]) => (
+                        <div className="related-product-spec" key={key}>
+                          <span className="related-spec-name">{key}:</span> {value}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <div className="no-related-products">
                 {product_code ? 
