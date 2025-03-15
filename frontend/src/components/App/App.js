@@ -9,6 +9,7 @@ import UserStore from '../../state/stores/UserStore';
 
 import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
+import UserFetchDetailsForm from '../UserFetchDetailsForm/UserFetchDetailsForm';
 
 
 const App = () => {
@@ -42,7 +43,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route path='/' element= {
-            <div>hellow world!</div>
+            <UserFetchDetailsForm />
           } />
           <Route path='/login' element= {
             <LoginForm />

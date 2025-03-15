@@ -23,6 +23,7 @@ class UserStore {
         throw response
       }
       this.data = await response.json()
+      console.log(this.data)
       this.emitter.emit('LOGIN_SUCCESS')
     } catch (err) {
       console.warn(err)
