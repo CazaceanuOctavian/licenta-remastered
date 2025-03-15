@@ -1,10 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AppContext from '../../../state/AppContext';
 import { SERVER } from '../../../config/global';
 import './ProductModal.css';
 
 const ProductModal = ({ product: initialProduct, onClose }) => {
+  // Reference to the modal container for scrolling
+  const modalRef = useRef(null);
+  
   // State to track the currently displayed product
   const [currentProduct, setCurrentProduct] = useState(initialProduct);
   // State to track related products
@@ -32,6 +35,13 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       }
     }
   }, [initialProduct]);
+
+  // Scroll to top when the current product changes
+  useEffect(() => {
+    if (modalRef.current) {
+      modalRef.current.scrollTop = 0;
+    }
+  }, [currentProduct]);
 
   // Function to fetch full product details with price history
   const fetchFullProductDetails = async (productId) => {
@@ -244,7 +254,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         onClose();
       }
     }}>
-      <div className="product-modal">
+      <div className="product-modal" ref={modalRef}>
         <div className="modal-header">
           <h2>{name}</h2>
           <button className="close-modal-btn" onClick={onClose}>×</button>
@@ -295,7 +305,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
               <div className="loading-price-history">Loading price history data...</div>
             ) : priceHistoryData.length > 0 ? (
               <div className="price-chart-container">
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={300}>
                   <LineChart
                     data={priceHistoryData}
                     margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
