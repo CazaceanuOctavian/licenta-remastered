@@ -8,6 +8,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Reference to the modal container for scrolling
   const modalRef = useRef(null);
   
+  // Get global state to check user login status
+  const globalState = useContext(AppContext);
+  
   // State to track the currently displayed product
   const [currentProduct, setCurrentProduct] = useState(initialProduct);
   // State to track related products
@@ -20,6 +23,20 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [priceHistoryData, setPriceHistoryData] = useState([]);
   // State to track if we need to fetch the full product details
   const [loadingFullProduct, setLoadingFullProduct] = useState(false);
+  // State to track if product is in favorites
+  const [isInFavorites, setIsInFavorites] = useState(false);
+  // State to track if adding to favorites
+  const [addingToFavorites, setAddingToFavorites] = useState(false);
+
+  // Check if user is logged in
+  const isUserLoggedIn = () => {
+    return (
+      globalState.user.data && 
+      globalState.user.data.email && 
+      globalState.user.data.token && 
+      globalState.user.data.id
+    );
+  };
 
   // Initialize allProducts with the initial product
   useEffect(() => {
@@ -41,7 +58,122 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     if (modalRef.current) {
       modalRef.current.scrollTop = 0;
     }
+    
+    // Check if product is in favorites when current product changes
+    if (isUserLoggedIn() && currentProduct) {
+      checkIfInFavorites();
+    }
   }, [currentProduct]);
+
+  // Check if the current product is in user's favorites
+  const checkIfInFavorites = async () => {
+    try {
+      // This is a placeholder - you would replace this with your actual API call
+      // to check if a product is in the user's favorites
+      const productId = currentProduct.id || currentProduct._id;
+      const userId = globalState.user.data.id;
+      
+      // Example API call (replace with your actual endpoint)
+      // const response = await fetch(`${SERVER}/api/favorites/check?userId=${userId}&productId=${productId}`, {
+      //   headers: {
+      //     'Authorization': `Bearer ${globalState.user.data.token}`
+      //   }
+      // });
+      // const data = await response.json();
+      // setIsInFavorites(data.isFavorite);
+      
+      // For now, let's assume it's not in favorites as a placeholder
+      setIsInFavorites(false);
+    } catch (error) {
+      console.error('Error checking favorites status:', error);
+    }
+  };
+
+  // Handle favorites button click
+  const handleFavoritesClick = () => {
+    if (!isUserLoggedIn()) {
+      // Redirect to login page if user is not logged in
+      window.location.href = '/#/login';
+      return;
+    }
+    
+    // If user is logged in, add/remove from favorites
+    if (isInFavorites) {
+      handleRemoveFromFavorites();
+    } else {
+      handleAddToFavorites();
+    }
+  };
+
+  // Handle adding product to favorites
+  const handleAddToFavorites = async () => {
+    if (!isUserLoggedIn()) return;
+    
+    try {
+      setAddingToFavorites(true);
+      const productId = currentProduct.id || currentProduct._id;
+      const userId = globalState.user.data.id;
+      
+      // Example API call (replace with your actual endpoint)
+      // const response = await fetch(`${SERVER}/api/favorites/add`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${globalState.user.data.token}`
+      //   },
+      //   body: JSON.stringify({ userId, productId })
+      // });
+      
+      // Simulate API call success (remove this when you implement the real API)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update state to reflect the product is now in favorites
+      setIsInFavorites(true);
+      setAddingToFavorites(false);
+      
+      // You might want to update the global state if you keep favorites there
+      // globalState.user.fetchFavorites();
+      
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      setAddingToFavorites(false);
+    }
+  };
+
+  // Handle removing product from favorites
+  const handleRemoveFromFavorites = async () => {
+    if (!isUserLoggedIn()) return;
+    
+    try {
+      setAddingToFavorites(true);
+      const productId = currentProduct.id || currentProduct._id;
+      const userId = globalState.user.data.id;
+      
+      // Example API call (replace with your actual endpoint)
+      // const response = await fetch(`${SERVER}/api/favorites/remove`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${globalState.user.data.token}`
+      //   },
+      //   body: JSON.stringify({ userId, productId })
+      // });
+      
+      // Simulate API call success (remove this when you implement the real API)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update state to reflect the product is no longer in favorites
+      setIsInFavorites(false);
+      setAddingToFavorites(false);
+      
+      // You might want to update the global state if you keep favorites there
+      // globalState.user.fetchFavorites();
+      
+    } catch (error) {
+      console.error('Error removing from favorites:', error);
+      setAddingToFavorites(false);
+    }
+  };
 
   // Function to fetch full product details with price history
   const fetchFullProductDetails = async (productId) => {
@@ -429,13 +561,33 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         </div>
         
         <div className="modal-footer">
-          <button 
-            className="add-to-cart-btn"
-            disabled={!is_in_stoc}
-          >
-            {is_in_stoc ? 'Add to Cart' : 'Out of Stock'}
-          </button>
-          <button className="close-btn" onClick={onClose}>Close</button>
+          <div className="modal-footer-actions">
+            {/* Always show favorites button, but handle login redirect for non-authenticated users */}
+            <button 
+              className={`favorites-btn ${isUserLoggedIn() && isInFavorites ? 'remove-favorites' : 'add-favorites'}`}
+              onClick={handleFavoritesClick}
+              disabled={addingToFavorites}
+            >
+              {addingToFavorites ? (
+                'Processing...'
+              ) : (isUserLoggedIn() && isInFavorites) ? (
+                'Remove from Favorites'
+              ) : (
+                'Add to Favorites'
+              )}
+            </button>
+            
+            <button 
+              className="add-to-cart-btn"
+              disabled={!is_in_stoc}
+            >
+              {is_in_stoc ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+            
+            <button className="close-btn" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
