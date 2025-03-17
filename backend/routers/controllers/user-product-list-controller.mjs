@@ -85,8 +85,31 @@ const deleteProductFromUserList = async (req, res, next) => {
     }
 }
 
+const checkProductInUserList = async (req, res, next) => {
+    try {
+        const productCode = req.params.pcode;
+        
+        if(!productCode) {
+            return res.status(400).json({message: 'Product code is required'})
+        }
+
+        const productInUserList = req.user.savedProducts.some(savedProductCode => 
+            savedProductCode.toString() === productCode.toString()
+        );
+
+        if (!productInUserList) {
+            return res.status(404).json({message: 'Product does not exist'})
+        }
+
+        return res.status(200).json({message: 'Product exists'})
+    } catch (err) {
+        next(err)
+    }
+}
+
 export default {
     saveProductToUserList,
     getUserListProducts,
-    deleteProductFromUserList
+    deleteProductFromUserList,
+    checkProductInUserList
 }

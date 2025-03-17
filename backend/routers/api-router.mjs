@@ -11,6 +11,7 @@ apiRouter.get('/products', controllers.product.getAllProductsFiltered)
 apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
 apiRouter.delete('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.deleteProductFromUserList)
 apiRouter.get('/users/userProductList', middleware.authMiddleware, controllers.userList.getUserListProducts)
+apiRouter.get('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.checkProductInUserList)
 
 //USERS
 apiRouter.get('/users', 
