@@ -53,6 +53,46 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     }
   }, [initialProduct]);
 
+  // Setup event listeners for favorites operations
+  useEffect(() => {
+    // Set up event listeners for favorites operations
+    const handleAddSuccess = () => {
+      setIsInFavorites(true);
+      setAddingToFavorites(false);
+      console.log('Product added to favorites successfully');
+    };
+    
+    const handleAddFail = () => {
+      setAddingToFavorites(false);
+      console.error('Failed to add product to favorites');
+    };
+    
+    const handleRemoveSuccess = () => {
+      setIsInFavorites(false);
+      setAddingToFavorites(false);
+      console.log('Product removed from favorites successfully');
+    };
+    
+    const handleRemoveFail = () => {
+      setAddingToFavorites(false);
+      console.error('Failed to remove product from favorites');
+    };
+    
+    // Add event listeners
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
+    globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
+    globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+    
+    // Clean up event listeners on component unmount
+    return () => {
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
+      globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+    };
+  }, [globalState.product.emitter]);
+
   // Scroll to top when the current product changes
   useEffect(() => {
     if (modalRef.current) {
@@ -68,21 +108,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Check if the current product is in user's favorites
   const checkIfInFavorites = async () => {
     try {
-      // This is a placeholder - you would replace this with your actual API call
-      // to check if a product is in the user's favorites
-      const productId = currentProduct.id || currentProduct._id;
-      const userId = globalState.user.data.id;
+      // This would typically be an API call to check if product is in favorites
+      // Since we don't have a direct method for this in the ProductStore,
+      // this is a placeholder for where you would implement that check
       
-      // Example API call (replace with your actual endpoint)
-      // const response = await fetch(`${SERVER}/api/favorites/check?userId=${userId}&productId=${productId}`, {
-      //   headers: {
-      //     'Authorization': `Bearer ${globalState.user.data.token}`
-      //   }
-      // });
-      // const data = await response.json();
-      // setIsInFavorites(data.isFavorite);
-      
-      // For now, let's assume it's not in favorites as a placeholder
+      // For now, we'll set it to false initially
       setIsInFavorites(false);
     } catch (error) {
       console.error('Error checking favorites status:', error);
@@ -92,7 +122,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Handle favorites button click
   const handleFavoritesClick = () => {
     if (!isUserLoggedIn()) {
-      // Redirect to login page if user is not logged in
+      // Redirect to login page
       window.location.href = '/#/login';
       return;
     }
@@ -111,29 +141,18 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     
     try {
       setAddingToFavorites(true);
-      const productId = currentProduct.id || currentProduct._id;
-      const userId = globalState.user.data.id;
+      const productCode = currentProduct.product_code;
       
-      // Example API call (replace with your actual endpoint)
-      // const response = await fetch(`${SERVER}/api/favorites/add`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${globalState.user.data.token}`
-      //   },
-      //   body: JSON.stringify({ userId, productId })
-      // });
+      if (!productCode) {
+        console.error('No product code available for this product');
+        setAddingToFavorites(false);
+        return;
+      }
       
-      // Simulate API call success (remove this when you implement the real API)
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Call the addProductToUserList method from ProductStore
+      await globalState.product.addProductToUserList(globalState, productCode);
       
-      // Update state to reflect the product is now in favorites
-      setIsInFavorites(true);
-      setAddingToFavorites(false);
-      
-      // You might want to update the global state if you keep favorites there
-      // globalState.user.fetchFavorites();
-      
+      // Note: The state update will happen through the event listener we set up
     } catch (error) {
       console.error('Error adding to favorites:', error);
       setAddingToFavorites(false);
@@ -146,29 +165,18 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     
     try {
       setAddingToFavorites(true);
-      const productId = currentProduct.id || currentProduct._id;
-      const userId = globalState.user.data.id;
+      const productCode = currentProduct.product_code;
       
-      // Example API call (replace with your actual endpoint)
-      // const response = await fetch(`${SERVER}/api/favorites/remove`, {
-      //   method: 'DELETE',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${globalState.user.data.token}`
-      //   },
-      //   body: JSON.stringify({ userId, productId })
-      // });
+      if (!productCode) {
+        console.error('No product code available for this product');
+        setAddingToFavorites(false);
+        return;
+      }
       
-      // Simulate API call success (remove this when you implement the real API)
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Call the removeProductFromUserList method from ProductStore
+      await globalState.product.removeProductFromUserList(globalState, productCode);
       
-      // Update state to reflect the product is no longer in favorites
-      setIsInFavorites(false);
-      setAddingToFavorites(false);
-      
-      // You might want to update the global state if you keep favorites there
-      // globalState.user.fetchFavorites();
-      
+      // Note: The state update will happen through the event listener we set up
     } catch (error) {
       console.error('Error removing from favorites:', error);
       setAddingToFavorites(false);

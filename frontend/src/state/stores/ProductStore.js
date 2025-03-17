@@ -22,6 +22,56 @@ class ProductStore {
             this.emitter.emit('PRODUCT_GET_ALL_ERROR');
         }
     }
+
+    async addProductToUserList(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'post',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_ADD_TO_USER_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_ADD_TO_USER_LIST_FAIL')
+        }
+    }
+
+    async removeProductFromUserList(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'delete',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_REMOVE_FROM_USER_LIST_FAIL')
+        }
+    }
+
+    async checkIfInFavorites(state, productCode) {
+        try {
+
+        } catch (err) {
+            console.warn(err)
+        }
+    }
 }
 
 export default ProductStore;
