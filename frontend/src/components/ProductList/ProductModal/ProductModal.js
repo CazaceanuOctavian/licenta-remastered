@@ -100,20 +100,26 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     }
     
     // Check if product is in favorites when current product changes
-    if (isUserLoggedIn() && currentProduct) {
+    if (isUserLoggedIn() && currentProduct && currentProduct.product_code) {
       checkIfInFavorites();
     }
   }, [currentProduct]);
 
   // Check if the current product is in user's favorites
   const checkIfInFavorites = async () => {
+    if (!isUserLoggedIn() || !currentProduct || !currentProduct.product_code) {
+      return;
+    }
+    
     try {
-      // This would typically be an API call to check if product is in favorites
-      // Since we don't have a direct method for this in the ProductStore,
-      // this is a placeholder for where you would implement that check
+      // Use the new checkIfInFavorites method from ProductStore
+      const isFavorite = await globalState.product.checkIfInFavorites(
+        globalState,
+        currentProduct.product_code
+      );
       
-      // For now, we'll set it to false initially
-      setIsInFavorites(false);
+      // Update state based on the result
+      setIsInFavorites(isFavorite);
     } catch (error) {
       console.error('Error checking favorites status:', error);
     }

@@ -67,9 +67,27 @@ class ProductStore {
 
     async checkIfInFavorites(state, productCode) {
         try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'get',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
 
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_CHECK_IN_USER_LIST_SUCCESS")
+            if (content.message === 'exists') {
+                return true 
+            } else {
+                return false
+            }
         } catch (err) {
             console.warn(err)
+            this.emitter.emit("PRODUCT_CHECK_IN_USER_LIST_FAIL")
         }
     }
 }

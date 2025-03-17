@@ -98,10 +98,10 @@ const checkProductInUserList = async (req, res, next) => {
         );
 
         if (!productInUserList) {
-            return res.status(404).json({message: 'Product does not exist'})
+            return res.status(200).json({message: 'not_exists'})
         }
 
-        return res.status(200).json({message: 'Product exists'})
+        return res.status(200).json({message: 'exists'})
     } catch (err) {
         next(err)
     }
