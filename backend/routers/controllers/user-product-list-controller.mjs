@@ -47,7 +47,7 @@ const getUserListProducts = async (req, res, next) => {
         });
 
         return res.status(200).json({
-            products: savedProducts
+            data: savedProducts
         });
     } catch (err) {
         next(err);

@@ -12,6 +12,7 @@ import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
 import UserFetchDetailsForm from '../UserFetchDetailsForm/UserFetchDetailsForm';
 import ProductList from '../ProductList/ProductList';
+import ProductCarousel from '../ProductList/ProductCarousel';
 
 
 const App = () => {
@@ -22,7 +23,6 @@ const App = () => {
   //DATA PERSISTENCE THROUGH LocalStoradge
   useEffect(() => {
     userStore.emitter.addListener('LOGIN_SUCCESS', () => {
-      // Save user data to localStorage when login is successful
       localStorage.setItem('user', JSON.stringify(userStore.data));
       setIsAuthenticated(true);
     });
@@ -69,6 +69,9 @@ const App = () => {
           <Route path='/products' element= {
             <ProductList />
           } />
+          <Route path='/favorites' element= {
+            <ProductCarousel />
+          }/>
         </Routes>
       </Router>
     </AppContext.Provider>

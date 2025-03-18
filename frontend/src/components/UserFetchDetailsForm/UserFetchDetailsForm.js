@@ -1,6 +1,5 @@
 import { useContext, useEffect } from "react"
 import AppContext from "../../state/AppContext"
-import UserStore from "../../state/stores/UserStore"
 
 const UserFetchDetailsForm = () => {
     const globalState = useContext(AppContext)

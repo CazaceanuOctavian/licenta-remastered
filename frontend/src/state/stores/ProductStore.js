@@ -90,6 +90,35 @@ class ProductStore {
             this.emitter.emit("PRODUCT_CHECK_IN_USER_LIST_FAIL")
         }
     }
+
+   // Solution 1: Add logging to see what's happening
+    async fetchFavoriteProducts(state) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList`, {
+                method: 'get',
+                headers: {
+                    authorization: `Bearer ${state.user.data.token}`
+                }
+            });
+
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json();
+            console.log("Full API response:", content); // See the full response
+            
+            this.data = content.data;
+            console.log("After assignment, this:", this); // Check what 'this' is
+            console.log("After assignment, this.data:", this.data); // Check data after assignment
+            
+            this.emitter.emit("PRODUCT_FETCH_FAVORITES_SUCCESS");
+        } catch (err) {
+            console.warn(this.data);
+            console.warn(err);
+            this.emitter.emit("PRODUCT_FETCH_FAVORITES_FAIL");
+        }
+    }
 }
 
 export default ProductStore;
