@@ -11,6 +11,12 @@ const FavoriteProductCarousel = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     
+    // Notification states
+    const [notificationPrefs, setNotificationPrefs] = useState({})
+    const [showPopup, setShowPopup] = useState(false)
+    const [currentProductType, setCurrentProductType] = useState(null)
+    const [userEmail, setUserEmail] = useState("")
+    
     // Refs for carousel navigation
     const carouselRefs = useRef({})
 
@@ -160,6 +166,33 @@ const FavoriteProductCarousel = () => {
         )
     }
 
+    // Handle notification preferences
+    const handleNotificationClick = (productType) => {
+        setCurrentProductType(productType);
+        setShowPopup(true);
+    }
+    
+    const handleSubscribe = (e) => {
+        e.preventDefault();
+        // Here you would typically send this to your backend
+        console.log(`Subscribed to updates for ${currentProductType} with email: ${userEmail}`);
+        
+        // Update notification preferences
+        setNotificationPrefs(prev => ({
+            ...prev,
+            [currentProductType]: true
+        }));
+        
+        // Close popup
+        setShowPopup(false);
+        setUserEmail("");
+    }
+    
+    const closePopup = () => {
+        setShowPopup(false);
+        setUserEmail("");
+    }
+
     return (
         <div className="favorite-products-container">
             <h2>My Favorite Products</h2>
@@ -175,14 +208,45 @@ const FavoriteProductCarousel = () => {
                     </div>
                 ) : favoriteProducts.length > 0 ? (
                     <div className="carousels-container">
-                        {productTypes.map(productType => 
-                            renderCarousel(productType, productsByType[productType])
-                        )}
+                        {productTypes.map(productType => (
+                            <div key={productType} className="carousel-wrapper">
+                                {renderCarousel(productType, productsByType[productType])}
+                                <div className="notification-option">
+                                    <label className="notification-checkbox">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={notificationPrefs[productType] || false}
+                                            onChange={() => handleNotificationClick(productType)}
+                                        />
+                                        <span className="checkmark"></span>
+                                        <span className="notification-text">Notify me when a better offer is available</span>
+                                    </label>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="no-favorites">
                         <p>You haven't added any products to your favorites yet.</p>
                         <a href="/products" className="browse-products-link">Browse Products</a>
+                    </div>
+                )}
+                
+                {/* Email Subscription Popup */}
+                {showPopup && (
+                    <div className="popup-overlay">
+                        <div className="popup-container">
+                            <button className="popup-close" onClick={closePopup}>×</button>
+                            <h3>Email Notifications</h3>
+                            <p>Would you like to receive email notifications when better offers are available for products with code <strong>{currentProductType}</strong>?</p>
+                            
+                            <form onSubmit={handleSubscribe}>                                
+                                <div className="popup-actions">
+                                    <button type="button" className="btn-cancel" onClick={closePopup}>Cancel</button>
+                                    <button type="submit" className="btn-subscribe">Subscribe</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 )}
             </div>

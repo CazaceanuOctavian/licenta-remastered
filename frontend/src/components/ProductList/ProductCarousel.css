@@ -1,6 +1,135 @@
-/* ProductCarousel.css */
-
-.favorite-products-container {
+/* Popup Styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .popup-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 25px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideUp 0.3s ease;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .popup-close:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .popup-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .popup-container p {
+    margin-bottom: 20px;
+    color: #555;
+    line-height: 1.5;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .form-group input:focus {
+    border-color: #2196F3;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  }
+  
+  .popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+  }
+  
+  .btn-cancel, .btn-subscribe {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-cancel {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    color: #555;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .btn-subscribe {
+    background-color: #2196F3;
+    border: none;
+    color: white;
+  }
+  
+  .btn-subscribe:hover {
+    background-color: #0b7dda;
+  }/* ProductCarousel.css */
+  
+  .favorite-products-container {
     padding: 20px;
     width: 100%;
     max-width: 1200px;
@@ -19,8 +148,85 @@
     gap: 40px;
   }
   
+  .carousel-wrapper {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #e0e0e0;
+  }
+  
+  .carousel-wrapper:last-child {
+    border-bottom: none;
+  }
+  
   .carousel-section {
     width: 100%;
+  }
+  
+  /* Notification Option Styles */
+  .notification-option {
+    margin-top: 15px;
+    padding: 0 10px;
+  }
+  
+  .notification-checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .notification-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  .checkmark {
+    position: relative;
+    height: 18px;
+    width: 18px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+  }
+  
+  .notification-checkbox:hover .checkmark {
+    background-color: #e0e0e0;
+  }
+  
+  .notification-checkbox input:checked ~ .checkmark {
+    background-color: #2196F3;
+    border-color: #2196F3;
+  }
+  
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  .notification-checkbox input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  .notification-checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .notification-text {
+    font-weight: 500;
   }
   
   .carousel-section h3 {

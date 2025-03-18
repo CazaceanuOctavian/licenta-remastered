@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import AppContext from "../../state/AppContext"
-import Product from "./Product/Product" // Import the Product component
+import Product from "./Product/Product"
 import './ProductList.css'
 
 const ProductList = () => {
