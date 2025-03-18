@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 import AppContext from '../../state/AppContext';
@@ -7,6 +7,7 @@ import AppContext from '../../state/AppContext';
 import ProductStore from '../../state/stores/ProductStore';
 import UserStore from '../../state/stores/UserStore';
 
+import Navbar from '../Navbar/Navbar'; 
 import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
 import UserFetchDetailsForm from '../UserFetchDetailsForm/UserFetchDetailsForm';
@@ -51,21 +52,10 @@ const App = () => {
       user: userStore,
       product: productStore
     }}>
-      {
-        isAuthenticated && (
-          <div className='app-header'>
-            <div>
-              <h5>Welcome, {userStore.data.email}</h5>
-            </div>
-            <div>
-              <button onClick={handleLogout}
-              >Logout
-              </button>
-            </div>
-          </div>
-        )
-      }
       <Router>
+        {/* Replace the conditional rendering with the Navbar component */}
+        <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
+        
         <Routes>
           <Route path='/' element= {
             <UserFetchDetailsForm />
