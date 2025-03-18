@@ -22,6 +22,98 @@ class ProductStore {
             this.emitter.emit('PRODUCT_GET_ALL_ERROR');
         }
     }
+
+    async addProductToUserList(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'post',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_ADD_TO_USER_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_ADD_TO_USER_LIST_FAIL')
+        }
+    }
+
+    async removeProductFromUserList(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'delete',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_REMOVE_FROM_USER_LIST_FAIL')
+        }
+    }
+
+    async checkIfInFavorites(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/${productCode}`, {
+                method: 'get',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            })
+            
+            if(!response.ok) {
+                throw response
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_CHECK_IN_USER_LIST_SUCCESS")
+            if (content.message === 'exists') {
+                return true 
+            } else {
+                return false
+            }
+        } catch (err) {
+            console.warn(err)
+            this.emitter.emit("PRODUCT_CHECK_IN_USER_LIST_FAIL")
+        }
+    }
+
+   // Solution 1: Add logging to see what's happening
+    async fetchFavoriteProducts(state) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList`, {
+                method: 'get',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            });
+
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json();            
+            this.data = content.data;
+            this.emitter.emit("PRODUCT_FETCH_FAVORITES_SUCCESS");
+        } catch (err) {
+            console.warn(this.data);
+            console.warn(err);
+            this.emitter.emit("PRODUCT_FETCH_FAVORITES_FAIL");
+        }
+    }
 }
 
 export default ProductStore;

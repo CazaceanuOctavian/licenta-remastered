@@ -1,9 +1,5 @@
 import models from '../models/index.mjs';
 
-/**
- * Authentication middleware for Express using Mongoose
- * Verifies the authorization token and attaches the user to the request
- */
 export default async (req, res, next) => {
   try {
     const token = req.headers.authorization;

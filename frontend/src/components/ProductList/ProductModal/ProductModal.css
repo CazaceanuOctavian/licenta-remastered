@@ -521,3 +521,62 @@
   }
   
   /* Add this to your existing CSS file */
+  /* Updated modal footer to support multiple buttons */
+.modal-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+/* Favorites button styles */
+.favorites-btn {
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.add-favorites {
+  background-color: white;
+  color: #ff6d00;
+  border-color: #ff6d00;
+}
+
+.add-favorites:hover:not(:disabled) {
+  background-color: #fff8e1;
+}
+
+.remove-favorites {
+  background-color: #ff6d00;
+  color: white;
+  border-color: #ff6d00;
+}
+
+.remove-favorites:hover:not(:disabled) {
+  background-color: #e65100;
+}
+
+.favorites-btn:disabled {
+  background-color: #e0e0e0;
+  color: #9e9e9e;
+  border-color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+/* Media queries for small screens */
+@media (max-width: 600px) {
+  .modal-footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .favorites-btn, 
+  .add-to-cart-btn, 
+  .close-btn {
+    width: 100%;
+  }
+}

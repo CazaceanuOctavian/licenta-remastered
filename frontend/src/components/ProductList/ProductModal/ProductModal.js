@@ -8,6 +8,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Reference to the modal container for scrolling
   const modalRef = useRef(null);
   
+  // Get global state to check user login status
+  const globalState = useContext(AppContext);
+  
   // State to track the currently displayed product
   const [currentProduct, setCurrentProduct] = useState(initialProduct);
   // State to track related products
@@ -20,6 +23,20 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [priceHistoryData, setPriceHistoryData] = useState([]);
   // State to track if we need to fetch the full product details
   const [loadingFullProduct, setLoadingFullProduct] = useState(false);
+  // State to track if product is in favorites
+  const [isInFavorites, setIsInFavorites] = useState(false);
+  // State to track if adding to favorites
+  const [addingToFavorites, setAddingToFavorites] = useState(false);
+
+  // Check if user is logged in
+  const isUserLoggedIn = () => {
+    return (
+      globalState.user.data && 
+      globalState.user.data.email && 
+      globalState.user.data.token && 
+      globalState.user.data.id
+    );
+  };
 
   // Initialize allProducts with the initial product
   useEffect(() => {
@@ -36,12 +53,141 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     }
   }, [initialProduct]);
 
+  // Setup event listeners for favorites operations
+  useEffect(() => {
+    // Set up event listeners for favorites operations
+    const handleAddSuccess = () => {
+      setIsInFavorites(true);
+      setAddingToFavorites(false);
+      console.log('Product added to favorites successfully');
+    };
+    
+    const handleAddFail = () => {
+      setAddingToFavorites(false);
+      console.error('Failed to add product to favorites');
+    };
+    
+    const handleRemoveSuccess = () => {
+      setIsInFavorites(false);
+      setAddingToFavorites(false);
+      console.log('Product removed from favorites successfully');
+    };
+    
+    const handleRemoveFail = () => {
+      setAddingToFavorites(false);
+      console.error('Failed to remove product from favorites');
+    };
+    
+    // Add event listeners
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
+    globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
+    globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+    
+    // Clean up event listeners on component unmount
+    return () => {
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
+      globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+    };
+  }, [globalState.product.emitter]);
+
   // Scroll to top when the current product changes
   useEffect(() => {
     if (modalRef.current) {
       modalRef.current.scrollTop = 0;
     }
+    
+    // Check if product is in favorites when current product changes
+    if (isUserLoggedIn() && currentProduct && currentProduct.product_code) {
+      checkIfInFavorites();
+    }
   }, [currentProduct]);
+
+  // Check if the current product is in user's favorites
+  const checkIfInFavorites = async () => {
+    if (!isUserLoggedIn() || !currentProduct || !currentProduct.product_code) {
+      return;
+    }
+    
+    try {
+      // Use the new checkIfInFavorites method from ProductStore
+      const isFavorite = await globalState.product.checkIfInFavorites(
+        globalState,
+        currentProduct.product_code
+      );
+      
+      // Update state based on the result
+      setIsInFavorites(isFavorite);
+    } catch (error) {
+      console.error('Error checking favorites status:', error);
+    }
+  };
+
+  // Handle favorites button click
+  const handleFavoritesClick = () => {
+    if (!isUserLoggedIn()) {
+      // Redirect to login page
+      window.location.href = '/#/login';
+      return;
+    }
+    
+    // If user is logged in, add/remove from favorites
+    if (isInFavorites) {
+      handleRemoveFromFavorites();
+    } else {
+      handleAddToFavorites();
+    }
+  };
+
+  // Handle adding product to favorites
+  const handleAddToFavorites = async () => {
+    if (!isUserLoggedIn()) return;
+    
+    try {
+      setAddingToFavorites(true);
+      const productCode = currentProduct.product_code;
+      
+      if (!productCode) {
+        console.error('No product code available for this product');
+        setAddingToFavorites(false);
+        return;
+      }
+      
+      // Call the addProductToUserList method from ProductStore
+      await globalState.product.addProductToUserList(globalState, productCode);
+      
+      // Note: The state update will happen through the event listener we set up
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      setAddingToFavorites(false);
+    }
+  };
+
+  // Handle removing product from favorites
+  const handleRemoveFromFavorites = async () => {
+    if (!isUserLoggedIn()) return;
+    
+    try {
+      setAddingToFavorites(true);
+      const productCode = currentProduct.product_code;
+      
+      if (!productCode) {
+        console.error('No product code available for this product');
+        setAddingToFavorites(false);
+        return;
+      }
+      
+      // Call the removeProductFromUserList method from ProductStore
+      await globalState.product.removeProductFromUserList(globalState, productCode);
+      
+      // Note: The state update will happen through the event listener we set up
+    } catch (error) {
+      console.error('Error removing from favorites:', error);
+      setAddingToFavorites(false);
+    }
+  };
 
   // Function to fetch full product details with price history
   const fetchFullProductDetails = async (productId) => {
@@ -429,13 +575,33 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         </div>
         
         <div className="modal-footer">
-          <button 
-            className="add-to-cart-btn"
-            disabled={!is_in_stoc}
-          >
-            {is_in_stoc ? 'Add to Cart' : 'Out of Stock'}
-          </button>
-          <button className="close-btn" onClick={onClose}>Close</button>
+          <div className="modal-footer-actions">
+            {/* Always show favorites button, but handle login redirect for non-authenticated users */}
+            <button 
+              className={`favorites-btn ${isUserLoggedIn() && isInFavorites ? 'remove-favorites' : 'add-favorites'}`}
+              onClick={handleFavoritesClick}
+              disabled={addingToFavorites}
+            >
+              {addingToFavorites ? (
+                'Processing...'
+              ) : (isUserLoggedIn() && isInFavorites) ? (
+                'Remove from Favorites'
+              ) : (
+                'Add to Favorites'
+              )}
+            </button>
+            
+            <button 
+              className="add-to-cart-btn"
+              disabled={!is_in_stoc}
+            >
+              {is_in_stoc ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+            
+            <button className="close-btn" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
