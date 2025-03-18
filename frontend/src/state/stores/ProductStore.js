@@ -97,7 +97,7 @@ class ProductStore {
             const response = await fetch(`${SERVER}/api/users/userProductList`, {
                 method: 'get',
                 headers: {
-                    authorization: `Bearer ${state.user.data.token}`
+                    authorization: state.user.data.token
                 }
             });
 
@@ -105,13 +105,8 @@ class ProductStore {
                 throw response;
             }
 
-            const content = await response.json();
-            console.log("Full API response:", content); // See the full response
-            
+            const content = await response.json();            
             this.data = content.data;
-            console.log("After assignment, this:", this); // Check what 'this' is
-            console.log("After assignment, this.data:", this.data); // Check data after assignment
-            
             this.emitter.emit("PRODUCT_FETCH_FAVORITES_SUCCESS");
         } catch (err) {
             console.warn(this.data);
