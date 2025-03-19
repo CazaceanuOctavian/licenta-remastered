@@ -1,6 +1,7 @@
 from scraper_manager.scraper_manager import ScraperManager
 from database_manager.database_manager import MongoManager
 from utils.os_utils import OsUtils
+
 from configparser import ConfigParser
 from datetime import datetime
 
