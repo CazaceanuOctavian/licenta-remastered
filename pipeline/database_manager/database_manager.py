@@ -1,3 +1,5 @@
+import json
+from bson import json_util
 from pymongo import MongoClient, UpdateOne
 from datetime import datetime
 
@@ -6,6 +8,21 @@ class MongoManager:
 
     def __init__(self, conn_string:str):
         self.__clinet = MongoClient(conn_string)
+
+    def fetch_collection(self, db_name:str, collection_name:str):
+        db = self.__clinet[db_name]
+        collection = db[collection_name]
+        cursor = collection.find()
+        documents = list(cursor)
+        return json.loads(json_util.dumps(documents))
+    
+    def fetch_collection_filtered(self, db_name:str, collection_name:str, filter_field:dict):
+        db = self.__clinet[db_name]
+        collection = db[collection_name]
+        cursor = collection.find(filter_field)
+        documents = list(cursor)
+        return json.loads(json_util.dumps(documents))
+
 
     def upsert_to_collection_from_list(self, db_name:str, collection_name:str, products:list[dict]):
         db = self.__clinet[db_name]
