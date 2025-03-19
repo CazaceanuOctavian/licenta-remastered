@@ -49,17 +49,35 @@ const getUserListProducts = async (req, res, next) => {
 
         const userProductCodes = req.user.savedProducts.map(product => product.product_code);
     
+        // Get products from database
         const savedProducts = await models.Product.find({
             product_code: { $in: userProductCodes }
         });
 
+        // Create a map of product_code to email_notification for quick lookup
+        const notificationMap = {};
+        req.user.savedProducts.forEach(product => {
+            notificationMap[product.product_code] = product.email_notification;
+        });
+        
+        // Add email_notification field to each product
+        const productsWithNotification = savedProducts.map(product => {
+            // Convert to plain object if it's a Mongoose document
+            const productObj = product.toObject ? product.toObject() : { ...product };
+            
+            // Add email_notification from user's saved products
+            productObj.email_notification = notificationMap[product.product_code] || false;
+            
+            return productObj;
+        });
+
         return res.status(200).json({
-            data: savedProducts
+            data: productsWithNotification
         });
     } catch (err) {
         next(err);
     }
-}
+};
 
 const deleteProductFromUserList = async (req, res, next) => {
     try {

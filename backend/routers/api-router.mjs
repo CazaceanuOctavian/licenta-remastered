@@ -15,7 +15,6 @@ apiRouter.get('/users/userProductList/:pcode', middleware.authMiddleware, contro
 //USER PRODUCT LIST --> MAIL NOTIFICATION SERVICE 
 apiRouter.post('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.addProcutToNotificationService)
 apiRouter.delete('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.removeProductFromNotificationService)
-
 //USERS
 apiRouter.get('/users', 
             middleware.authMiddleware, 
