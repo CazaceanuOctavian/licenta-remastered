@@ -7,10 +7,12 @@ class MongoManager:
     def __init__(self, conn_string:str):
         self.__clinet = MongoClient(conn_string)
 
-    def upsert_from_list(collenction:str, products:list[dict]):
+    def upsert_to_collection_from_list(self, db_name:str, collection_name:str, products:list[dict]):
+        db = self.__clinet[db_name]
+        collection = db[collection_name]
           # Prepare bulk operations
         operations = []
-        current_timestamp = datetime.datetime.now()
+        current_timestamp = datetime.now()
         
         for product in products:
             # Create a unique identifier for the product
@@ -47,7 +49,7 @@ class MongoManager:
         
         # Execute all operations at once
         if operations:
-            result = collenction.bulk_write(operations)
+            result = collection.bulk_write(operations)
             print(f"Modified: {result.modified_count}, Upserted: {result.upserted_count}")
         else:
             print("No operations to perform.")
