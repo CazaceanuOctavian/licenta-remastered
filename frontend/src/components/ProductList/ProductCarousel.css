@@ -455,3 +455,22 @@
       right: -10px;
     }
   }
+
+  .btn-cancel, .btn-subscribe, .btn-unsubscribe {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-subscribe, .btn-unsubscribe {
+    background-color: #2196F3;
+    border: none;
+    color: white;
+  }
+  
+  .btn-subscribe:hover, .btn-unsubscribe:hover {
+    background-color: #0b7dda;
+  }

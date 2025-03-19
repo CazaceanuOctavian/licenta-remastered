@@ -23,9 +23,15 @@ const createUserEntity = () => {
       default: 'user'
     },
     savedProducts: [{
-      type: String, // Changed from ObjectId to String to store product_code
-      required: true,
-      trim: true
+      product_code: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      email_notification: {
+        type: Boolean,
+        default: false
+      }
     }],
     createdAt: {
       type: Date,

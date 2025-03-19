@@ -10,6 +10,7 @@ const FavoriteProductCarousel = () => {
     const [productTypes, setProductTypes] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [mailingListStatus, setMailingListStatus] = useState(null)
     
     // Notification states
     const [notificationPrefs, setNotificationPrefs] = useState({})
@@ -28,12 +29,18 @@ const FavoriteProductCarousel = () => {
         globalState.product.emitter.addListener('PRODUCT_FETCH_FAVORITES_SUCCESS', handleFavoritesFetched)
         globalState.product.emitter.addListener('PRODUCT_FETCH_FAVORITES_FAIL', handleFetchError)
         globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleProductRemoved)
+        
+        // Add listeners for mailing list events
+        globalState.product.emitter.addListener('PRODUCT_ADD_TO_MAILING_LIST_SUCCESS', handleMailingListSuccess)
+        globalState.product.emitter.addListener('PRODUCT_ADD_TO_MAILING_LIST_FAIL', handleMailingListError)
 
         // Cleanup listeners when component unmounts
         return () => {
             globalState.product.emitter.removeAllListeners('PRODUCT_FETCH_FAVORITES_SUCCESS')
             globalState.product.emitter.removeAllListeners('PRODUCT_FETCH_FAVORITES_FAIL')
             globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS')
+            globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_MAILING_LIST_SUCCESS')
+            globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_MAILING_LIST_FAIL')
         }
     }, [])
 
@@ -55,6 +62,17 @@ const FavoriteProductCarousel = () => {
             
             setProductsByType(groupedProducts)
             setProductTypes(Object.keys(groupedProducts))
+            
+            // Initialize notification preferences based on email_notification property
+            const initialNotificationPrefs = {}
+            
+            Object.entries(groupedProducts).forEach(([productCode, products]) => {
+                // Check if all products in this group have email_notification set to true
+                const allHaveEmailNotification = products.every(product => product.email_notification === true)
+                initialNotificationPrefs[productCode] = allHaveEmailNotification
+            })
+            
+            setNotificationPrefs(initialNotificationPrefs)
         }
     }, [favoriteProducts])
 
@@ -77,6 +95,30 @@ const FavoriteProductCarousel = () => {
     const handleProductRemoved = () => {
         // Refresh the favorites list after removing a product
         fetchFavoriteProducts()
+    }
+    
+    const handleMailingListSuccess = () => {
+        setMailingListStatus({
+            type: 'success',
+            message: 'Email notification preference updated successfully!'
+        })
+        
+        // Clear status message after a delay
+        setTimeout(() => {
+            setMailingListStatus(null)
+        }, 3000)
+    }
+    
+    const handleMailingListError = () => {
+        setMailingListStatus({
+            type: 'error',
+            message: 'Failed to update email notification preference. Please try again.'
+        })
+        
+        // Clear status message after a delay
+        setTimeout(() => {
+            setMailingListStatus(null)
+        }, 5000)
     }
 
     const removeFromFavorites = (productCode) => {
@@ -167,20 +209,35 @@ const FavoriteProductCarousel = () => {
     }
 
     // Handle notification preferences
+    const [isUnsubscribing, setIsUnsubscribing] = useState(false)
+    
     const handleNotificationClick = (productType) => {
         setCurrentProductType(productType);
+        
+        // Check if we're enabling or disabling notifications
+        const isCurrentlyEnabled = notificationPrefs[productType] || false;
+        setIsUnsubscribing(isCurrentlyEnabled);
         setShowPopup(true);
     }
     
     const handleSubscribe = (e) => {
         e.preventDefault();
-        // Here you would typically send this to your backend
-        console.log(`Subscribed to updates for ${currentProductType} with email: ${userEmail}`);
         
-        // Update notification preferences
+        // Make API calls based on subscribe/unsubscribe action
+        if (isUnsubscribing) {
+            // Call API to remove from mailing list
+            globalState.product.removeProductFromMailingList(globalState, currentProductType);
+            console.log(`Unsubscribed from updates for ${currentProductType}`);
+        } else {
+            // Call API to add to mailing list
+            globalState.product.addProductToMailingList(globalState, currentProductType);
+            console.log(`Subscribed to updates for ${currentProductType}`);
+        }
+        
+        // Update local notification preferences state
         setNotificationPrefs(prev => ({
             ...prev,
-            [currentProductType]: true
+            [currentProductType]: !isUnsubscribing
         }));
         
         // Close popup
@@ -198,6 +255,13 @@ const FavoriteProductCarousel = () => {
             <h2>My Favorite Products</h2>
             
             <div className="favorite-products-content">
+                {/* Status Message */}
+                {mailingListStatus && (
+                    <div className={`status-message ${mailingListStatus.type}`}>
+                        <p>{mailingListStatus.message}</p>
+                    </div>
+                )}
+                
                 {/* Loading State */}
                 {loading ? (
                     <div className="loading">Loading your favorite products...</div>
@@ -232,20 +296,38 @@ const FavoriteProductCarousel = () => {
                     </div>
                 )}
                 
-                {/* Email Subscription Popup */}
+                {/* Email Subscription/Unsubscription Popup */}
                 {showPopup && (
                     <div className="popup-overlay">
                         <div className="popup-container">
                             <button className="popup-close" onClick={closePopup}>×</button>
                             <h3>Email Notifications</h3>
-                            <p>Would you like to receive email notifications when better offers are available for products with code <strong>{currentProductType}</strong>?</p>
                             
-                            <form onSubmit={handleSubscribe}>                                
-                                <div className="popup-actions">
-                                    <button type="button" className="btn-cancel" onClick={closePopup}>Cancel</button>
-                                    <button type="submit" className="btn-subscribe">Subscribe</button>
-                                </div>
-                            </form>
+                            {isUnsubscribing ? (
+                                /* Unsubscribe Popup Content */
+                                <>
+                                    <p>Are you sure you want to stop receiving email notifications for better offers on products with code <strong>{currentProductType}</strong>?</p>
+                                    
+                                    <form onSubmit={handleSubscribe}>                                
+                                        <div className="popup-actions">
+                                            <button type="button" className="btn-cancel" onClick={closePopup}>Cancel</button>
+                                            <button type="submit" className="btn-unsubscribe">Unsubscribe</button>
+                                        </div>
+                                    </form>
+                                </>
+                            ) : (
+                                /* Subscribe Popup Content */
+                                <>
+                                    <p>Would you like to receive email notifications when better offers are available for products with code <strong>{currentProductType}</strong>?</p>
+                                    
+                                    <form onSubmit={handleSubscribe}>                                
+                                        <div className="popup-actions">
+                                            <button type="button" className="btn-cancel" onClick={closePopup}>Cancel</button>
+                                            <button type="submit" className="btn-subscribe">Subscribe</button>
+                                        </div>
+                                    </form>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
