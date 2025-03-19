@@ -55,6 +55,17 @@ const FavoriteProductCarousel = () => {
             
             setProductsByType(groupedProducts)
             setProductTypes(Object.keys(groupedProducts))
+            
+            // Initialize notification preferences based on email_notification property
+            const initialNotificationPrefs = {}
+            
+            Object.entries(groupedProducts).forEach(([productCode, products]) => {
+                // Check if all products in this group have email_notification set to true
+                const allHaveEmailNotification = products.every(product => product.email_notification === true)
+                initialNotificationPrefs[productCode] = allHaveEmailNotification
+            })
+            
+            setNotificationPrefs(initialNotificationPrefs)
         }
     }, [favoriteProducts])
 
