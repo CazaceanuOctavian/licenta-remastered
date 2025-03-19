@@ -91,7 +91,6 @@ class ProductStore {
         }
     }
 
-   // Solution 1: Add logging to see what's happening
     async fetchFavoriteProducts(state) {
         try {
             const response = await fetch(`${SERVER}/api/users/userProductList`, {
@@ -114,6 +113,49 @@ class ProductStore {
             this.emitter.emit("PRODUCT_FETCH_FAVORITES_FAIL");
         }
     }
+
+    async addProductToMailingList(state, pcode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/mailing/${pcode}`, {
+                method: 'post',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            });
+
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_ADD_TO_MAILING_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err)
+            this.emitter.emit("PRODUCT_ADD_TO_MAILING_LIST_FAIL")
+        }
+    }
+
+    async removeProductFromMailingList(state, pcode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/userProductList/mailing/${pcode}`, {
+                method: 'delete',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            });
+
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json()
+            this.emitter.emit("PRODUCT_ADD_TO_MAILING_LIST_SUCCESS")
+        } catch (err) {
+            console.warn(err)
+            this.emitter.emit("PRODUCT_ADD_TO_MAILING_LIST_FAIL")
+        }
+    }
+    
 }
 
 export default ProductStore;
