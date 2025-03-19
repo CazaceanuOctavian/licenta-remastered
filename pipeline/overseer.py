@@ -37,11 +37,9 @@ def check_products(user_product_list, database_manager, database, collection):
 
 def notify_users_by_mail(mail_manager, database_manager, userList, database, collection):
     for user in userList:
-        body = check_products(body, user['savedProducts'], database_manager, database, collection)
-        if len(body)>0:
-            mail_manager.send_email_to_address('Update pentru produsele tale favorite', body, user['email'])
-
-
+        mail_body = check_products(user['savedProducts'], database_manager, database, collection)
+        if len(mail_body)>0:
+            mail_manager.send_email_to_address('Update pentru produsele tale favorite', mail_body, user['email'])
 
 def main():
     global_cfg = ConfigParser()
@@ -59,6 +57,7 @@ def main():
     mail_manager = MailManager(env_cfg['Email']['address'],
                                 env_cfg['Email']['password'], 'smtp.gmail.com', 587) 
     
+    #TODO --> muta unde trebuie 
     notify_users_by_mail(mail_manager, database_manager, database_manager.fetch_collection('app', 'users'), 'app', 'products')
 
 
