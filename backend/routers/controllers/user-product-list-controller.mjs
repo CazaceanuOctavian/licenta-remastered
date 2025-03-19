@@ -123,9 +123,48 @@ const checkProductInUserList = async (req, res, next) => {
     }
 }
 
+const updateMailNotificationState = async (req, res, next) => {
+    try {
+        const productCode = req.params.pcode;
+
+        if (!productCode) {
+            return res.status(400).json({ message: 'Product code is required' });
+        }
+
+        const userProductCodes = req.user.savedProducts.map(product => product.product_code);
+
+        const productInUserList = userProductCodes.some(savedProductCode => 
+            savedProductCode.toString() === productCode.toString()
+        );
+        
+        if (!productInUserList) {
+            return res.status(404).json({ message: 'Product is not in user list' });
+        }
+
+        const productIndex = req.user.savedProducts.findIndex(product => 
+            product.product_code.toString() === productCode.toString()
+        );
+
+        // Update the email_notification to true
+        req.user.savedProducts[productIndex].email_notification = true;
+
+        // Save the updated user
+        await req.user.save();
+
+        return res.status(200).json({
+            message: 'Notification preference updated successfully',
+            product: req.user.savedProducts[productIndex]
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 export default {
     saveProductToUserList,
     getUserListProducts,
     deleteProductFromUserList,
-    checkProductInUserList
+    checkProductInUserList,
+    updateMailNotificationState
 }

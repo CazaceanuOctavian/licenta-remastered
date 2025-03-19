@@ -12,6 +12,7 @@ apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, contr
 apiRouter.delete('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.deleteProductFromUserList)
 apiRouter.get('/users/userProductList', middleware.authMiddleware, controllers.userList.getUserListProducts)
 apiRouter.get('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.checkProductInUserList)
+apiRouter.post('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.updateMailNotificationState)
 
 //USERS
 apiRouter.get('/users', 
