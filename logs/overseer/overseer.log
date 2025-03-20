@@ -1,0 +1,43 @@
+2025-03-20 10:24:47 - product_overseer - INFO - === Starting product overseer process ===
+2025-03-20 10:24:47 - product_overseer - INFO - Loading configuration files
+2025-03-20 10:24:47 - product_overseer - INFO - Running process for date: 2025_03_20
+2025-03-20 10:24:47 - product_overseer - INFO - Initializing managers
+2025-03-20 10:24:47 - product_overseer - INFO - Initializing Scraper manager
+2025-03-20 10:24:47 - product_overseer - CRITICAL - Critical error in main process: 'Paths'
+2025-03-20 10:24:47 - product_overseer - ERROR - Stack trace:
+Traceback (most recent call last):
+  File "/home/tav/licenta_remastered/pipeline/overseer.py", line 135, in main
+    global_cfg['Paths']['vexio_scraper'],
+    ~~~~~~~~~~^^^^^^^^^
+  File "/nix/store/26yi95240650jxp5dj78xzch70i1kzlz-python3-3.12.9/lib/python3.12/configparser.py", line 941, in __getitem__
+    raise KeyError(key)
+KeyError: 'Paths'
+2025-03-20 10:24:47 - product_overseer - INFO - === Product overseer process failed after 0.00 seconds ===
+2025-03-20 10:25:39 - product_overseer - INFO - === Starting product overseer process ===
+2025-03-20 10:25:39 - product_overseer - INFO - Loading configuration files
+2025-03-20 10:25:39 - product_overseer - INFO - Running process for date: 2025_03_20
+2025-03-20 10:25:39 - product_overseer - INFO - Initializing managers
+2025-03-20 10:25:39 - product_overseer - INFO - Initializing Scraper manager
+2025-03-20 10:25:39 - product_overseer - INFO - Initializing MongoDB manager
+2025-03-20 10:25:39 - product_overseer - INFO - Successfully connected to MongoDB
+2025-03-20 10:25:39 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-03-20 10:27:55 - product_overseer - INFO - Email manager initialized
+2025-03-20 10:27:55 - product_overseer - INFO - Starting scraping and database update process
+2025-03-20 10:27:55 - product_overseer - INFO - Starting scraping process with timeout: 180 seconds
+2025-03-20 10:30:55 - product_overseer - INFO - Scraping completed. Output files: /home/tav/licenta_remastered/scrapers/vexio/output//vexio_2025_03_20.json, /home/tav/licenta_remastered/scrapers/evomag/output//evomag_2025_03_20.json
+2025-03-20 10:30:55 - product_overseer - INFO - Retrieved 284 products from scrapers
+2025-03-20 10:30:55 - product_overseer - INFO - Upserting 284 products to app.products
+2025-03-20 10:30:56 - product_overseer - INFO - Database upsert completed successfully
+2025-03-20 10:30:56 - product_overseer - INFO - Starting user notification process
+2025-03-20 10:30:56 - product_overseer - INFO - Retrieved 3 users from database
+2025-03-20 10:30:56 - product_overseer - INFO - Starting email notification process for 3 users
+2025-03-20 10:30:56 - product_overseer - INFO - Checking price changes for 3 user products
+2025-03-20 10:30:56 - product_overseer - INFO - Found 0 products with price drops
+2025-03-20 10:30:56 - product_overseer - INFO - Checking price changes for 0 user products
+2025-03-20 10:30:56 - product_overseer - INFO - Found 0 products with price drops
+2025-03-20 10:30:56 - product_overseer - INFO - Checking price changes for 2 user products
+2025-03-20 10:30:56 - product_overseer - INFO - Price drop detected for product 82YU00YWRM from 1879.99 to 1849.99
+2025-03-20 10:30:56 - product_overseer - INFO - Found 1 products with price drops
+2025-03-20 10:30:56 - product_overseer - INFO - Sending price drop notification to octavian.caz@gmail.com
+2025-03-20 10:30:56 - product_overseer - INFO - Email notification process completed. Sent 1 notifications
+2025-03-20 10:30:56 - product_overseer - INFO - === Product overseer process completed in 317.67 seconds ===
