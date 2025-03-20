@@ -56,18 +56,16 @@ def main():
 
     mail_manager = MailManager(env_cfg['Email']['address'],
                                 env_cfg['Email']['password'], 'smtp.gmail.com', 587) 
-    
-    #TODO --> muta unde trebuie 
-    notify_users_by_mail(mail_manager, database_manager, database_manager.fetch_collection('app', 'users'), 'app', 'products')
-
 
     database_manager.upsert_to_collection_from_list('app',
                                                     'products',
                                                     scrape(scraper_manager, global_cfg, current_date))
 
-    notify_users_by_mail(mail_manager,
-                        database_manager.fetch_collection('app', 'users'))
-
+    notify_users_by_mail(mail_manager, 
+                        database_manager, 
+                        database_manager.fetch_collection('app', 'users'),
+                        'app',
+                        'products')
 
 if __name__ == '__main__':
     main()
