@@ -45,13 +45,15 @@ class RegressionManager:
         # Reorder columns according to required order
         return df_dataset[required_column_order]
     
-    def predict_price(self, df_features:pd.DataFrame):            
+    def predict_price(self, df_features:pd.DataFrame, attach_to:list[dict] = None):        
+        # Make predictions
         predicted_prices = self.__model.predict(df_features)
         
-        # result = []
-        # for i, item in enumerate(dataset):
-        #     item_copy = item.copy()  
-        #     item_copy['predicted_price'] = float(predicted_prices[i])
-        #     result.append(item_copy)
+        # If attach_to is provided, add the predictions to each dictionary in the list
+        if attach_to is not None:
+            for i, item_dict in enumerate(attach_to):
+                # Make sure we don't go out of bounds of the predictions array
+                if i < len(predicted_prices):
+                    item_dict["recommended_price"] = predicted_prices[i]
         
-        return predicted_prices
+        return predicted_prices, attach_to
