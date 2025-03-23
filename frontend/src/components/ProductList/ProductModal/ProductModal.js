@@ -387,7 +387,8 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     specifications, 
     is_in_stoc, 
     description, 
-    product_code
+    product_code,
+    recommended_price
   } = currentProduct;
 
   // Calculate y-axis domain
@@ -410,6 +411,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
           <div className="modal-top-info">
             <div className="modal-main-details">
               <div className="modal-price">{price?.toFixed(2)} RON</div>
+              <div className="modal-recommended-price">
+                <strong>Recommended Price:</strong> {recommended_price ? `${recommended_price.toFixed(2)} RON` : 'Not available'}
+              </div>
               <div className={`modal-stock ${is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
                 {is_in_stoc ? 'In Stock' : 'Out of Stock'}
               </div>
