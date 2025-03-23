@@ -41,3 +41,161 @@ KeyError: 'Paths'
 2025-03-20 10:30:56 - product_overseer - INFO - Sending price drop notification to octavian.caz@gmail.com
 2025-03-20 10:30:56 - product_overseer - INFO - Email notification process completed. Sent 1 notifications
 2025-03-20 10:30:56 - product_overseer - INFO - === Product overseer process completed in 317.67 seconds ===
+2025-03-22 23:26:30 - product_overseer - INFO - === Starting product overseer process ===
+2025-03-22 23:26:30 - product_overseer - INFO - Loading configuration files
+2025-03-22 23:26:30 - product_overseer - INFO - Running process for date: 2025_03_22
+2025-03-22 23:26:30 - product_overseer - INFO - Initializing managers
+2025-03-22 23:26:30 - product_overseer - INFO - Initializing Scraper manager
+2025-03-22 23:26:30 - product_overseer - INFO - Initializing MongoDB manager
+2025-03-22 23:26:30 - product_overseer - INFO - Successfully connected to MongoDB
+2025-03-22 23:26:30 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-03-22 23:26:31 - product_overseer - INFO - Email manager initialized
+2025-03-22 23:26:31 - product_overseer - INFO - Starting scraping and database update process
+2025-03-22 23:26:31 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds
+2025-03-23 05:26:31 - product_overseer - INFO - Scraping completed. Output files: /home/tav/licenta_remastered/scrapers/vexio/output//vexio_2025_03_22.json, /home/tav/licenta_remastered/scrapers/evomag/output//evomag_2025_03_22.json
+2025-03-23 05:26:31 - product_overseer - INFO - Retrieved 18709 products from scrapers
+2025-03-23 05:26:31 - product_overseer - INFO - Upserting 18709 products to app.products
+2025-03-23 05:27:02 - product_overseer - ERROR - Error during database upsert: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67df2b06adb7549b636130f0, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+Traceback (most recent call last):
+  File "/home/tav/licenta_remastered/pipeline/overseer.py", line 46, in upsert
+    database_manager.upsert_to_collection_from_list(db_name, collection_name, scraped_products)
+  File "/home/tav/licenta_remastered/pipeline/database_manager/database_manager.py", line 69, in upsert_to_collection_from_list
+    result = collection.bulk_write(operations)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/collection.py", line 791, in bulk_write
+    bulk_api_result = blk.execute(write_concern, session, _Op.INSERT)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/bulk.py", line 736, in execute
+    return self.execute_command(generator, write_concern, session, operation)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/bulk.py", line 593, in execute_command
+    _ = client._retryable_write(
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1898, in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1784, in _retry_with_session
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2662, in _write
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67df2b06adb7549b636130f0, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-03-23 05:27:02 - product_overseer - INFO - Starting user notification process
+2025-03-23 05:27:32 - product_overseer - CRITICAL - Critical error in main process: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67df2b06adb7549b636130f0, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-03-23 05:27:32 - product_overseer - ERROR - Stack trace:
+Traceback (most recent call last):
+  File "/home/tav/licenta_remastered/pipeline/overseer.py", line 161, in main
+    users = database_manager.fetch_collection('app', 'users')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/tav/licenta_remastered/pipeline/database_manager/database_manager.py", line 16, in fetch_collection
+    documents = list(cursor)
+                ^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/cursor.py", line 1281, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/cursor.py", line 1257, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/cursor.py", line 1205, in _refresh
+    self._send_message(q)
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/cursor.py", line 1100, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1754, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1863, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2689, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/3s9zb8zb1976nlr5janb23nw7lwas3p9-python3-3.12.9-env/lib/python3.12/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 67df2b06adb7549b636130f0, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-03-23 05:27:32 - product_overseer - INFO - === Product overseer process failed after 21662.42 seconds ===
+2025-03-23 08:30:55 - product_overseer - INFO - === Starting product overseer process ===
+2025-03-23 08:30:55 - product_overseer - INFO - Loading configuration files
+2025-03-23 08:30:55 - product_overseer - INFO - Running process for date: 2025_03_23
+2025-03-23 08:30:55 - product_overseer - INFO - Initializing managers
+2025-03-23 08:30:55 - product_overseer - INFO - Initializing Scraper manager
+2025-03-23 08:30:55 - product_overseer - INFO - Initializing MongoDB manager
+2025-03-23 08:30:55 - product_overseer - INFO - Successfully connected to MongoDB
+2025-03-23 08:30:55 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-03-23 08:30:55 - product_overseer - INFO - Email manager initialized
+2025-03-23 08:30:55 - product_overseer - INFO - Starting scraping and database update process
+2025-03-23 08:30:55 - product_overseer - INFO - Starting scraping process with timeout: 2 seconds
+2025-03-23 08:30:57 - product_overseer - INFO - Scraping completed. Output files: /home/tav/licenta_remastered/scrapers/vexio/output//vexio_2025_03_22.json, /home/tav/licenta_remastered/scrapers/evomag/output//evomag_2025_03_22.json
+2025-03-23 08:30:58 - product_overseer - INFO - Retrieved 18709 products from scrapers
+2025-03-23 08:30:58 - product_overseer - INFO - Upserting 18709 products to app.products
+2025-03-23 08:31:02 - product_overseer - INFO - Database upsert completed successfully
+2025-03-23 08:31:02 - product_overseer - INFO - Starting user notification process
+2025-03-23 08:31:02 - product_overseer - INFO - Retrieved 3 users from database
+2025-03-23 08:31:02 - product_overseer - INFO - Starting email notification process for 3 users
+2025-03-23 08:31:02 - product_overseer - INFO - Checking price changes for 3 user products
+2025-03-23 08:31:02 - product_overseer - INFO - Found 0 products with price drops
+2025-03-23 08:31:02 - product_overseer - INFO - Checking price changes for 0 user products
+2025-03-23 08:31:02 - product_overseer - INFO - Found 0 products with price drops
+2025-03-23 08:31:02 - product_overseer - INFO - Checking price changes for 2 user products
+2025-03-23 08:31:02 - product_overseer - INFO - Price drop detected for product 82YU00YWRM from 1879.99 to 1849.99
+2025-03-23 08:31:02 - product_overseer - INFO - Found 1 products with price drops
+2025-03-23 08:31:02 - product_overseer - INFO - Sending price drop notification to octavian.caz@gmail.com
+2025-03-23 08:31:03 - product_overseer - INFO - Email notification process completed. Sent 1 notifications
+2025-03-23 08:31:03 - product_overseer - INFO - === Product overseer process completed in 7.94 seconds ===
