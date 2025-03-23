@@ -1,6 +1,6 @@
 import json
 from bson import json_util
-from pymongo import MongoClient, UpdateOne
+from pymongo import MongoClient, UpdateOne, UpdateMany
 from datetime import datetime
 
 class MongoManager:
@@ -22,7 +22,6 @@ class MongoManager:
         cursor = collection.find(filter_field)
         documents = list(cursor)
         return json.loads(json_util.dumps(documents))
-
 
     def upsert_to_collection_from_list(self, db_name:str, collection_name:str, products:list[dict]):
         db = self.__clinet[db_name]
@@ -74,11 +73,12 @@ class MongoManager:
     def update_recommended_price_from_list(self, db_name:str, collection_name:str, products:list[dict]):
         """
         Updates the recommended_price field for a list of products.
+        Updates all products with the same product_code regardless of online_mag.
         
         Parameters:
         db_name (str): The name of the database
         collection_name (str): The name of the collection
-        products (list[dict]): List of product dictionaries containing at least product_code, online_mag, and recommended_price
+        products (list[dict]): List of product dictionaries containing at least product_code and recommended_price
         
         Returns:
         None
@@ -91,19 +91,20 @@ class MongoManager:
         
         for product in products:
             # Ensure the product has the required fields
-            if not all(key in product for key in ["product_code", "online_mag", "recommended_price"]):
+            if not all(key in product for key in ["product_code", "recommended_price"]):
                 print(f"Skipping product due to missing required fields: {product.get('product_code', 'Unknown')}")
                 continue
                 
-            # Create a unique identifier for the product
+            # Create a filter that matches all products with the same product_code
+            # regardless of online_mag
             product_identifier = {
-                "product_code": product["product_code"],
-                "online_mag": product["online_mag"]
+                "product_code": product["product_code"]
             }
             
             # Create an update operation to set only the recommended_price field
-            update_operation = UpdateOne(
-                # Filter criteria to find the document
+            # Using UpdateMany to update all products with the same product_code
+            update_operation = UpdateMany(
+                # Filter criteria to find all documents with the same product_code
                 product_identifier,
                 # Update only the recommended_price field
                 {

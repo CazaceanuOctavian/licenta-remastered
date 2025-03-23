@@ -52,3 +52,4 @@ Thumbs.db
 
 # secret cfg
 cfg-secret.ini
+logs/overseer/overseer.log
