@@ -9,7 +9,9 @@ from regression_manager.dataset_cleanup_manager import DatasetCleanupManager
 
 from configparser import ConfigParser
 from datetime import datetime
+
 import os
+import json
 
 current_date = datetime.now().strftime('%Y_%m_%d')
 
@@ -113,9 +115,10 @@ def notify_users_by_mail(mail_manager, database_manager, userList, database, col
         logger.exception(f"Error during email notification process: {str(e)}")
 
 def predict_target_product_prices(db_manager:MongoManager, reg_manager:RegressionManager, cleanup_manager:DatasetCleanupManager, database:str, collection:str, target_category:str):
+    logger.info(f"Using regression model to predict prices of products of type: {target_category}")
     filter_criteria = {
         "predicted_price": {"$exists": False},
-        "category": {target_category},
+        "category": target_category,
         "online_mag": "evomag"
     }
 
@@ -124,6 +127,9 @@ def predict_target_product_prices(db_manager:MongoManager, reg_manager:Regressio
     clean_products = cleanup_manager.clean_dataset(fetched_products)
 
     predicted_prices, final_products = reg_manager.predict_price(clean_products, fetched_products) 
+
+    logger.info(f"Successfully predicted prices of products of type: {target_category}")
+
 
     return final_products   
 
@@ -163,6 +169,12 @@ def main():
         regression_manager = RegressionManager(global_cfg['Regression']['model_path'])
         cleanup_manager = DatasetCleanupManager()
         logger.info("Successfully initialized regression managers")
+
+        #TESTING===========================================================================
+        predicted_products = predict_target_product_prices(database_manager, regression_manager, cleanup_manager, 'app', 'products', 'Telefoane')
+        logger.info("Updating products with the new recommended price...")
+        database_manager.update_recommended_price_from_list('app', 'products', predicted_products)
+        
         
         logger.info("Initializing MailManager manager... This might take a while....")
         mail_manager = MailManager(
@@ -172,7 +184,7 @@ def main():
             587
         )
         logger.info("Email manager initialized")
-        
+ 
         # Scrape data and update database
         logger.info("Starting scraping and database update process")
         scraped_products = scrape(scraper_manager, global_cfg, current_date)
@@ -193,7 +205,9 @@ def main():
             'products'
         )
 
-
+        predicted_products = predict_target_product_prices(database_manager, regression_manager, cleanup_manager, 'app', 'products', 'Telefoane')
+        logger.info("Updating products with the new recommended price...")
+        database_manager.update_recommended_price_from_list('app', 'products', predicted_products)
         
         execution_time = (datetime.now() - start_time).total_seconds()
         logger.info(f"=== Product overseer process completed in {execution_time:.2f} seconds ===")

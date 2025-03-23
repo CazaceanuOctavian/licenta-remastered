@@ -70,3 +70,54 @@ class MongoManager:
             print(f"Modified: {result.modified_count}, Upserted: {result.upserted_count}")
         else:
             print("No operations to perform.")
+
+    def update_recommended_price_from_list(self, db_name:str, collection_name:str, products:list[dict]):
+        """
+        Updates the recommended_price field for a list of products.
+        
+        Parameters:
+        db_name (str): The name of the database
+        collection_name (str): The name of the collection
+        products (list[dict]): List of product dictionaries containing at least product_code, online_mag, and recommended_price
+        
+        Returns:
+        None
+        """
+        db = self.__clinet[db_name]
+        collection = db[collection_name]
+        
+        # Prepare bulk operations
+        operations = []
+        
+        for product in products:
+            # Ensure the product has the required fields
+            if not all(key in product for key in ["product_code", "online_mag", "recommended_price"]):
+                print(f"Skipping product due to missing required fields: {product.get('product_code', 'Unknown')}")
+                continue
+                
+            # Create a unique identifier for the product
+            product_identifier = {
+                "product_code": product["product_code"],
+                "online_mag": product["online_mag"]
+            }
+            
+            # Create an update operation to set only the recommended_price field
+            update_operation = UpdateOne(
+                # Filter criteria to find the document
+                product_identifier,
+                # Update only the recommended_price field
+                {
+                    "$set": {
+                        "recommended_price": product["recommended_price"]
+                    }
+                }
+            )
+            
+            operations.append(update_operation)
+        
+        # Execute all operations at once
+        if operations:
+            result = collection.bulk_write(operations)
+            print(f"Modified: {result.modified_count}")
+        else:
+            print("No operations to perform.")
