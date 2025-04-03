@@ -199,6 +199,7 @@ def main():
             'products'
         )
 
+        # Predict product prices
         predicted_products = predict_target_product_prices(database_manager, regression_manager, cleanup_manager, 'app', 'products', 'Telefoane')
         logger.info("Updating products with the new recommended price...")
         database_manager.update_recommended_price_from_list('app', 'products', predicted_products)

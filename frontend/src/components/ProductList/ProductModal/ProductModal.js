@@ -595,13 +595,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
               )}
             </button>
             
-            <button 
-              className="add-to-cart-btn"
-              disabled={!is_in_stoc}
-            >
-              {is_in_stoc ? 'Add to Cart' : 'Out of Stock'}
-            </button>
-            
             <button className="close-btn" onClick={onClose}>
               Close
             </button>

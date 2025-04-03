@@ -4,8 +4,7 @@ import Product from "./Product/Product"
 import './ProductList.css'
 
 const ProductList = () => {
-    //TODO --> FIX PAGINATION
-            // FIX MANUFACTURER --> Fa-l sa apara doar dupa ce s-au cautat deja produse...
+    //TODO --> FIX MANUFACTURER --> Fa-l sa apara doar dupa ce s-au cautat deja produse...
 
     const globalState = useContext(AppContext)
     const [products, setProducts] = useState([])
@@ -14,31 +13,51 @@ const ProductList = () => {
     const [manufacturer, setManufacturer] = useState('')
     const [minPrice, setMinPrice] = useState('')
     const [maxPrice, setMaxPrice] = useState('')
-    const [pageSize, setPageSize] = useState('')
-    const [pageNumber, setPageNumber] = useState('')
+    const [pageSize, setPageSize] = useState('20') // Set default pageSize to 20
+    const [pageNumber, setPageNumber] = useState('0') // Start at page 0
     const [sortField, setSortField] = useState('')
     const [sortOrder, setSortOrder] = useState('')
     const [extendedProduct] = useState('')
     const [productCode, setProductCode] = useState('')
     const [loading, setLoading] = useState(true)
+    const [filterCounter, setFilterCounter] = useState(0)
 
     useEffect(() => {
-        // Fetch products when component mounts
-        fetchProducts()
-
+        // Set initial page to 0
+        setPageNumber('0')
+        
         // Add listener for successful product fetch
         globalState.product.emitter.addListener('PRODUCT_GET_ALL_SUCCESS', handleProductsFetched)
-    }, [])
+        
+        // Clean up listener when component unmounts
+        return () => {
+            globalState.product.emitter.removeAllListeners('PRODUCT_GET_ALL_SUCCESS', handleProductsFetched)
+        }
+    }, []) // Empty dependency array means this runs once on mount
+    
+    // Separate useEffect to fetch products when component mounts or pageNumber changes
+    useEffect(() => {
+        fetchProducts()
+    }, [pageNumber]) // This will run when pageNumber changes
+    
+    // Don't automatically fetch on filter changes - only on Apply button click or page change
+    useEffect(() => {
+        if (filterCounter > 0) { // Skip the initial render
+            fetchProducts()
+        }
+    }, [filterCounter])
 
     const fetchProducts = () => {
         setLoading(true)
+        console.log(`Fetching products for page: ${pageNumber}`)
+        
         globalState.product.getAllProducts(
             name, 
             manufacturer, 
             minPrice, 
             maxPrice, 
-            pageSize, 
-            pageNumber, 
+            pageSize || '20', // Use 20 as fallback if pageSize is empty
+            pageNumber || '0', // Use 0 as fallback if pageNumber is empty
             sortField, 
             sortOrder, 
             extendedProduct, 
@@ -51,9 +70,12 @@ const ProductList = () => {
         setLoading(false)
     }
 
-    // Handle filter changes
+    // Handle filter changes - THIS WAS MISSING
     const applyFilters = () => {
-        fetchProducts()
+        // Reset to first page when applying filters
+        setPageNumber('0')
+        // Increment filter counter to trigger a fetch
+        setFilterCounter(prev => prev + 1)
     }
 
     return (
@@ -149,9 +171,16 @@ const ProductList = () => {
                             <label>Items Per Page</label>
                             <select 
                                 value={pageSize} 
-                                onChange={(e) => setPageSize(e.target.value)}
+                                onChange={(e) => {
+                                    setPageSize(e.target.value)
+                                    // Reset to first page and fetch products with new page size
+                                    setPageNumber('0')
+                                    setTimeout(() => {
+                                        // Increment filter counter to trigger a fetch with the new page size
+                                        setFilterCounter(prev => prev + 1)
+                                    }, 0) // Ensure state updates before fetch
+                                }}
                             >
-                                <option value="">Select count</option>
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                                 <option value="50">50</option>
@@ -177,20 +206,20 @@ const ProductList = () => {
                             <div className="pagination">
                                 <button 
                                     onClick={() => {
-                                        const newPage = Math.max(1, parseInt(pageNumber) - 1)
+                                        const newPage = Math.max(0, parseInt(pageNumber) - 1)
                                         setPageNumber(newPage.toString())
-                                        fetchProducts()
+                                        // No need to call fetchProducts as useEffect will handle it
                                     }}
-                                    disabled={pageNumber === '1' || !pageNumber}
+                                    disabled={pageNumber === '0' || !pageNumber}
                                 >
                                     Previous
                                 </button>
-                                <span>Page {pageNumber || 1}</span>
+                                <span>Page {parseInt(pageNumber || '0') + 1}</span>
                                 <button 
                                     onClick={() => {
-                                        const newPage = parseInt(pageNumber || '1') + 1
+                                        const newPage = parseInt(pageNumber || '0') + 1
                                         setPageNumber(newPage.toString())
-                                        fetchProducts()
+                                        // No need to call fetchProducts as useEffect will handle it
                                     }}
                                 >
                                     Next

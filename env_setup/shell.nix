@@ -10,9 +10,11 @@
     scikit-learn
     matplotlib
     seaborn
+    xgboost
+    catboost
     # Add any other Python packages you need here
   ];
-
+  
   # This sets up pip to work properly in the shell environment
   shellHook = ''
     export PIP_PREFIX="$(pwd)/_build/pip_packages"
@@ -21,4 +23,3 @@
     unset SOURCE_DATE_EPOCH
   '';
 }
-
