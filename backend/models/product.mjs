@@ -27,6 +27,11 @@ const createProductEntity = () => {
       type: Number,
       required: true
     },
+    // Add the recommended_price field as an optional float
+    recommended_price: {
+      type: Number,
+      required: false
+    },
     // Add the price_history field as an array of price history objects
     price_history: {
       type: [priceHistorySchema],

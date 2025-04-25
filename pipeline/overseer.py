@@ -199,6 +199,7 @@ def main():
             'products'
         )
 
+        # Predict product prices
         predicted_products = predict_target_product_prices(database_manager, regression_manager, cleanup_manager, 'app', 'products', 'Telefoane')
         logger.info("Updating products with the new recommended price...")
         database_manager.update_recommended_price_from_list('app', 'products', predicted_products)
@@ -210,7 +211,7 @@ def main():
         logger.critical(f"Critical error in main process: {str(e)}")
         logger.exception("Stack trace:")
         
-        execution_time = (datetime.now() - start_time).total_seconds()
+        execution_time = (datetime.now() - start_time).total_seconds()  
         logger.info(f"=== Product overseer process failed after {execution_time:.2f} seconds ===")
 
 if __name__ == '__main__':
