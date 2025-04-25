@@ -4,6 +4,10 @@ import AppContext from '../../../state/AppContext';
 import { SERVER } from '../../../config/global';
 import './ProductModal.css';
 
+// Configuration constants
+const PRICE_TOLERANCE = 0.15; // 15% price tolerance for similar products
+const CAROUSEL_PAGE_SIZE = 4; // Items per page in carousel
+
 const ProductModal = ({ product: initialProduct, onClose }) => {
   // Reference to the modal container for scrolling
   const modalRef = useRef(null);
@@ -33,7 +37,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [carouselPage, setCarouselPage] = useState(0);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [totalSimilarProducts, setTotalSimilarProducts] = useState(0);
-  const carouselPageSize = 4; // Items per page in carousel
+
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
@@ -149,16 +153,24 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       category = currentProduct.manufacturer;
     }
     
-    // Fetch products with pagination and filtering
+    // Calculate price range based on current product price
+    // Get products within the defined price tolerance
+    const currentPrice = parseFloat(currentProduct.price || 0);
+    const minPrice = (currentPrice * (1 - PRICE_TOLERANCE)).toFixed(2);
+    const maxPrice = (currentPrice * (1 + PRICE_TOLERANCE)).toFixed(2);
+    
+    console.log(`Fetching similar products with category: ${category}, price range: ${minPrice} - ${maxPrice}`);
+    
+    // Fetch products with pagination and price filtering
     globalState.product.getAllProducts(
       category, // search by category/name
-      '', // manufacturer
-      '', // minPrice
-      '', // maxPrice
-      carouselPageSize.toString(), // pageSize
+      '', // manufacturer - could also filter by same manufacturer
+      minPrice.toString(), // minPrice
+      maxPrice.toString(), // maxPrice
+      CAROUSEL_PAGE_SIZE.toString(), // pageSize
       carouselPage.toString(), // pageNumber
-      '', // sortField
-      '', // sortOrder
+      'price', // sortField - sort by price to get most relevant
+      'asc', // sortOrder - ascending to show lower prices first
       '', // extendedProduct
       '' // productCode
     );
@@ -729,7 +741,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                   </div>
                 </div>
 
-                {similarProducts.length === carouselPageSize && (
+                {similarProducts.length === CAROUSEL_PAGE_SIZE && (
                   <button 
                     className="carousel-nav next" 
                     onClick={handleCarouselNext}
