@@ -88,19 +88,19 @@ def format_data(item):
 
         #=====scraping image===== 
         # TODO --> Fa sa mearga la un moment dat...  
-        # img_name = 'not_found.jpeg'
-        # if imageUrl != 'err':
-        #     try:
-        #         img_data = requests.get(imageUrl).content
-        #         img_name = product_code + '.jpeg'
-        #         #
-        #         filepath = os.path.join(config['Paths']['image_output'], img_name) 
-        #         with open(filepath, 'wb') as file:
-        #             file.write(img_data)
-        #     except Exception as e:
-        #         with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
-        #             logs.write('ERR FOR IMAGE SCRAPING: ' + name)
-        #             logs.write('ERR: ' + str({e}) + '\n')
+        img_name = 'not_found.jpeg'
+        if imageUrl != 'err':
+            try:
+                img_data = requests.get(imageUrl).content
+                img_name = product_code + '.jpeg'
+                #
+                filepath = os.path.join(config['Paths']['image_output'], img_name) 
+                with open(filepath, 'wb') as file:
+                    file.write(img_data)
+            except Exception as e:
+                with open(config['Paths']['vexio_output'] + 'errLog-' + str(currentDate) + '.txt', 'a') as logs:
+                    logs.write('ERR FOR IMAGE SCRAPING: ' + name)
+                    logs.write('ERR: ' + str({e}) + '\n')
         #=====scraping image=====
 
         print('vexio -- ' + name)
