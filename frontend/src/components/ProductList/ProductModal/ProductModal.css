@@ -580,3 +580,183 @@
     width: 100%;
   }
 }
+
+/* Add these styles to your existing ProductModal.css */
+
+/* Similar Products Carousel Styles */
+.modal-similar-products {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.similar-products-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 50px; /* Space for navigation buttons */
+}
+
+.carousel-container {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.carousel-grid {
+  display: flex;
+  gap: 1rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.similar-product-card {
+  flex: 0 0 calc(25% - 0.75rem); /* 4 items per row, accounting for gap */
+  min-width: 200px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.similar-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.similar-product-card.lower-price {
+  border-color: #4caf50;
+}
+
+.similar-product-card.higher-price {
+  border-color: #f44336;
+}
+
+.similar-product-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.similar-product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.similar-product-price {
+  font-weight: 600;
+  color: #1976d2;
+}
+
+.similar-product-stock {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.similar-product-stock.in-stock {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.similar-product-stock.out-of-stock {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.similar-product-manufacturer {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.carousel-nav:hover {
+  background: #f5f5f5;
+  color: #1976d2;
+}
+
+.carousel-nav.prev {
+  left: 0;
+}
+
+.carousel-nav.next {
+  right: 0;
+}
+
+.carousel-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.similar-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+/* No Similar Products */
+.no-similar-products {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .similar-product-card {
+      flex: 0 0 calc(33.333% - 0.66rem); /* 3 items per row */
+  }
+}
+
+@media (max-width: 900px) {
+  .similar-product-card {
+      flex: 0 0 calc(50% - 0.5rem); /* 2 items per row */
+  }
+}
+
+@media (max-width: 600px) {
+  .similar-product-card {
+      flex: 0 0 100%; /* 1 item per row */
+  }
+  
+  .similar-products-carousel {
+      padding: 0 30px; /* Less padding on mobile */
+  }
+  
+  .carousel-nav {
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+  }
+}

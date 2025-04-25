@@ -27,6 +27,13 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [isInFavorites, setIsInFavorites] = useState(false);
   // State to track if adding to favorites
   const [addingToFavorites, setAddingToFavorites] = useState(false);
+  
+  // Carousel state
+  const [similarProducts, setSimilarProducts] = useState([]);
+  const [carouselPage, setCarouselPage] = useState(0);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [totalSimilarProducts, setTotalSimilarProducts] = useState(0);
+  const carouselPageSize = 4; // Items per page in carousel
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
@@ -92,6 +99,70 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
     };
   }, [globalState.product.emitter]);
+
+  // Handle carousel products fetch
+  useEffect(() => {
+    const handleSimilarProductsFetched = () => {
+      setSimilarProducts(globalState.product.data);
+      setTotalSimilarProducts(globalState.product.data.length);
+      setLoadingSimilar(false);
+    };
+
+    // Add listener for successful product fetch
+    globalState.product.emitter.addListener('PRODUCT_GET_ALL_SUCCESS', handleSimilarProductsFetched);
+    
+    // Clean up listener when component unmounts
+    return () => {
+      globalState.product.emitter.removeAllListeners('PRODUCT_GET_ALL_SUCCESS', handleSimilarProductsFetched);
+    };
+  }, [globalState.product]);
+
+  // Fetch similar products when current product changes or page changes
+  useEffect(() => {
+    if (currentProduct) {
+      fetchSimilarProducts();
+    }
+  }, [currentProduct, carouselPage]);
+
+  // Function to fetch similar products
+  const fetchSimilarProducts = () => {
+    if (!currentProduct) return;
+    
+    setLoadingSimilar(true);
+    
+    // Extract category from current product
+    // Look for common categories in specifications
+    const specifications = currentProduct.specifications || {};
+    let category = '';
+    
+    // Try to find category-related fields in specifications
+    const categoryKeys = ['category', 'type', 'product_type', 'categorie', 'tip'];
+    for (const key of categoryKeys) {
+      if (specifications[key]) {
+        category = specifications[key];
+        break;
+      }
+    }
+    
+    // If no category found, use manufacturer
+    if (!category && currentProduct.manufacturer) {
+      category = currentProduct.manufacturer;
+    }
+    
+    // Fetch products with pagination and filtering
+    globalState.product.getAllProducts(
+      category, // search by category/name
+      '', // manufacturer
+      '', // minPrice
+      '', // maxPrice
+      carouselPageSize.toString(), // pageSize
+      carouselPage.toString(), // pageNumber
+      '', // sortField
+      '', // sortOrder
+      '', // extendedProduct
+      '' // productCode
+    );
+  };
 
   // Scroll to top when the current product changes
   useEffect(() => {
@@ -383,6 +454,15 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     ];
   };
 
+  // Handle carousel navigation
+  const handleCarouselNext = () => {
+    setCarouselPage(prev => prev + 1);
+  };
+
+  const handleCarouselPrev = () => {
+    setCarouselPage(prev => Math.max(0, prev - 1));
+  };
+
   // Early return if no product
   if (!currentProduct) return null;
 
@@ -596,6 +676,72 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                   `No related products found with code: ${product_code}` : 
                   'No product code available to search related products.'
                 }
+              </div>
+            )}
+          </div>
+
+          {/* Similar Products Carousel */}
+          <div className="modal-similar-products">
+            <h3>Similar Products</h3>
+            {loadingSimilar ? (
+              <div className="similar-loading">Loading similar products...</div>
+            ) : similarProducts.length > 0 ? (
+              <div className="similar-products-carousel">
+                {carouselPage > 0 && (
+                  <button 
+                    className="carousel-nav prev" 
+                    onClick={handleCarouselPrev}
+                    aria-label="Previous products"
+                  >
+                    &#8249;
+                  </button>
+                )}
+                
+                <div className="carousel-container">
+                  <div className="carousel-grid">
+                    {similarProducts.map((similarProduct) => {
+                      const productId = similarProduct.id || similarProduct._id;
+                      const currentProductId = currentProduct.id || currentProduct._id;
+                      
+                      // Skip the current product
+                      if (productId === currentProductId) return null;
+                      
+                      return (
+                        <div 
+                          className={`similar-product-card ${getPriceComparisonClass(similarProduct.price)}`} 
+                          key={productId}
+                          onClick={() => handleProductSwitch(productId)}
+                        >
+                          <div className="similar-product-name">{similarProduct.name}</div>
+                          <div className="similar-product-info">
+                            <div className="similar-product-price">{similarProduct.price?.toFixed(2)} RON</div>
+                            <div className={`similar-product-stock ${similarProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
+                              {similarProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
+                            </div>
+                          </div>
+                          <div className="similar-product-manufacturer">
+                            By: {similarProduct.manufacturer}
+                          </div>
+                          <div className="view-product-hint">Click to view</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {similarProducts.length === carouselPageSize && (
+                  <button 
+                    className="carousel-nav next" 
+                    onClick={handleCarouselNext}
+                    aria-label="Next products"
+                  >
+                    &#8250;
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="no-similar-products">
+                No similar products found.
               </div>
             )}
           </div>
