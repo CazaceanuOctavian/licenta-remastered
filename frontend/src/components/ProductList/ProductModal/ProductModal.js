@@ -110,6 +110,16 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       setSimilarProducts(globalState.product.data);
       setTotalSimilarProducts(globalState.product.data.length);
       setLoadingSimilar(false);
+      
+      // Update allProducts with the newly fetched similar products
+      const updatedProducts = { ...allProducts };
+      globalState.product.data.forEach(product => {
+        const productId = product.id || product._id;
+        if (!updatedProducts[productId]) {
+          updatedProducts[productId] = product;
+        }
+      });
+      setAllProducts(updatedProducts);
     };
 
     // Add listener for successful product fetch
@@ -413,7 +423,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Handle switching to a related product
   const handleProductSwitch = (productId) => {
     // Find the product in our cached products
-    const newMainProduct = allProducts[productId];
+    const newMainProduct = allProducts[productId] || similarProducts.find(p => (p.id || p._id) === productId);
     
     if (newMainProduct) {
       // Set the clicked product as the main product
@@ -423,6 +433,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       if (!newMainProduct.price_history) {
         fetchFullProductDetails(productId);
       }
+      
+      // Reset carousel page to 0 when switching products
+      setCarouselPage(0);
     }
   };
 
