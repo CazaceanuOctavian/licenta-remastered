@@ -37,6 +37,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [carouselPage, setCarouselPage] = useState(0);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [totalSimilarProducts, setTotalSimilarProducts] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState('left');
+  const [allSimilarProducts, setAllSimilarProducts] = useState([]); // All fetched products
+  const [displayedProducts, setDisplayedProducts] = useState([]); // Products currently shown
 
 
   // Check if user is logged in
@@ -104,48 +108,33 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     };
   }, [globalState.product.emitter]);
 
-  // Handle carousel products fetch
+  // Remove the event listener for carousel products fetch
+  // since we're now fetching directly
+
+  // Update displayed products when page changes or all similar products change
   useEffect(() => {
-    const handleSimilarProductsFetched = () => {
-      setSimilarProducts(globalState.product.data);
-      setTotalSimilarProducts(globalState.product.data.length);
-      setLoadingSimilar(false);
-      
-      // Update allProducts with the newly fetched similar products
-      const updatedProducts = { ...allProducts };
-      globalState.product.data.forEach(product => {
-        const productId = product.id || product._id;
-        if (!updatedProducts[productId]) {
-          updatedProducts[productId] = product;
-        }
-      });
-      setAllProducts(updatedProducts);
-    };
+    if (allSimilarProducts.length > 0) {
+      const startIndex = carouselPage * CAROUSEL_PAGE_SIZE;
+      const endIndex = startIndex + CAROUSEL_PAGE_SIZE;
+      const pageProducts = allSimilarProducts.slice(startIndex, endIndex);
+      setDisplayedProducts(pageProducts);
+    }
+  }, [carouselPage, allSimilarProducts]);
 
-    // Add listener for successful product fetch
-    globalState.product.emitter.addListener('PRODUCT_GET_ALL_SUCCESS', handleSimilarProductsFetched);
-    
-    // Clean up listener when component unmounts
-    return () => {
-      globalState.product.emitter.removeAllListeners('PRODUCT_GET_ALL_SUCCESS', handleSimilarProductsFetched);
-    };
-  }, [globalState.product]);
-
-  // Fetch similar products when current product changes or page changes
+  // Fetch similar products when current product changes
   useEffect(() => {
     if (currentProduct) {
       fetchSimilarProducts();
     }
-  }, [currentProduct, carouselPage]);
+  }, [currentProduct]); // Only fetch when product changes, not when page changes
 
-  // Function to fetch similar products
-  const fetchSimilarProducts = () => {
+  // Function to fetch similar products directly using API
+  const fetchSimilarProducts = async () => {
     if (!currentProduct) return;
     
     setLoadingSimilar(true);
     
     // Extract category from current product
-    // Look for common categories in specifications
     const specifications = currentProduct.specifications || {};
     let category = '';
     
@@ -163,27 +152,53 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       category = currentProduct.manufacturer;
     }
     
-    // Calculate price range based on current product price
-    // Get products within the defined price tolerance
+    // Calculate price range
     const currentPrice = parseFloat(currentProduct.price || 0);
     const minPrice = (currentPrice * (1 - PRICE_TOLERANCE)).toFixed(2);
     const maxPrice = (currentPrice * (1 + PRICE_TOLERANCE)).toFixed(2);
     
     console.log(`Fetching similar products with category: ${category}, price range: ${minPrice} - ${maxPrice}`);
     
-    // Fetch products with pagination and price filtering
-    globalState.product.getAllProducts(
-      category, // search by category/name
-      '', // manufacturer - could also filter by same manufacturer
-      minPrice.toString(), // minPrice
-      maxPrice.toString(), // maxPrice
-      CAROUSEL_PAGE_SIZE.toString(), // pageSize
-      carouselPage.toString(), // pageNumber
-      'price', // sortField - sort by price to get most relevant
-      'asc', // sortOrder - ascending to show lower prices first
-      '', // extendedProduct
-      '' // productCode
-    );
+    try {
+      // Fetch directly using API to avoid interfering with the main product list
+      const response = await fetch(
+        `${SERVER}/api/products?name=${encodeURIComponent(category)}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=100&pageNumber=0`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch similar products: ${response.status}`);
+      }
+      
+      const content = await response.json();
+      
+      if (!content.data || !Array.isArray(content.data)) {
+        console.error('Invalid response format:', content);
+        setLoadingSimilar(false);
+        return;
+      }
+      
+      // Filter out the current product
+      const currentProductId = currentProduct?.id || currentProduct?._id;
+      const filteredProducts = content.data.filter(product => {
+        const productId = product.id || product._id;
+        return productId !== currentProductId;
+      });
+      
+      // Shuffle the products array
+      const shuffledProducts = [...filteredProducts];
+      for (let i = shuffledProducts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledProducts[i], shuffledProducts[j]] = [shuffledProducts[j], shuffledProducts[i]];
+      }
+      
+      setAllSimilarProducts(shuffledProducts);
+      setTotalSimilarProducts(shuffledProducts.length);
+      setLoadingSimilar(false);
+      
+    } catch (error) {
+      console.error('Error fetching similar products:', error);
+      setLoadingSimilar(false);
+    }
   };
 
   // Scroll to top when the current product changes
@@ -402,9 +417,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         const productsMap = { ...allProducts };
         related.forEach(product => {
           const productId = product.id || product._id;
-          if (!productsMap[productId]) {
-            productsMap[productId] = product;
-          }
+          productsMap[productId] = product;
         });
         
         setAllProducts(productsMap);
@@ -422,8 +435,14 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
 
   // Handle switching to a related product
   const handleProductSwitch = (productId) => {
-    // Find the product in our cached products
-    const newMainProduct = allProducts[productId] || similarProducts.find(p => (p.id || p._id) === productId);
+    // Find the product in our cached products first
+    let newMainProduct = allProducts[productId];
+    
+    // If not found in cached products, try to find it in allSimilarProducts or relatedProducts
+    if (!newMainProduct) {
+      newMainProduct = allSimilarProducts.find(p => (p.id || p._id) === productId) || 
+                      relatedProducts.find(p => (p.id || p._id) === productId);
+    }
     
     if (newMainProduct) {
       // Set the clicked product as the main product
@@ -436,6 +455,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       
       // Reset carousel page to 0 when switching products
       setCarouselPage(0);
+      
+      // Clear similar products to force a new fetch and shuffle
+      setAllSimilarProducts([]);
+      setDisplayedProducts([]);
     }
   };
 
@@ -481,11 +504,29 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
 
   // Handle carousel navigation
   const handleCarouselNext = () => {
-    setCarouselPage(prev => prev + 1);
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setSlideDirection('left');
+    
+    // Wait for animation to complete before updating page
+    setTimeout(() => {
+      setCarouselPage(prev => prev + 1);
+      setIsTransitioning(false);
+    }, 300); // Match CSS transition duration
   };
 
   const handleCarouselPrev = () => {
-    setCarouselPage(prev => Math.max(0, prev - 1));
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setSlideDirection('right');
+    
+    // Wait for animation to complete before updating page
+    setTimeout(() => {
+      setCarouselPage(prev => Math.max(0, prev - 1));
+      setIsTransitioning(false);
+    }, 300); // Match CSS transition duration
   };
 
   // Early return if no product
@@ -676,6 +717,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                         className={`related-product-card ${getPriceComparisonClass(relatedProduct.price)}`} 
                         key={productId}
                         onClick={() => handleProductSwitch(productId)}
+                        style={{ cursor: 'pointer' }}
                       >
                         <div className="related-product-name">{relatedProduct.name}</div>
                         <div className="related-product-info">
@@ -710,21 +752,29 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
             <h3>Similar Products</h3>
             {loadingSimilar ? (
               <div className="similar-loading">Loading similar products...</div>
-            ) : similarProducts.length > 0 ? (
+            ) : displayedProducts.length > 0 ? (
               <div className="similar-products-carousel">
                 {carouselPage > 0 && (
                   <button 
                     className="carousel-nav prev" 
                     onClick={handleCarouselPrev}
                     aria-label="Previous products"
+                    disabled={isTransitioning}
                   >
                     &#8249;
                   </button>
                 )}
                 
                 <div className="carousel-container">
-                  <div className="carousel-grid">
-                    {similarProducts.map((similarProduct) => {
+                  <div 
+                    className={`carousel-grid ${isTransitioning ? `slide-${slideDirection}` : ''}`}
+                    style={{
+                      transform: isTransitioning ? 
+                        (slideDirection === 'left' ? 'translateX(-100%)' : 'translateX(100%)') : 
+                        'translateX(0)'
+                    }}
+                  >
+                    {displayedProducts.map((similarProduct) => {
                       const productId = similarProduct.id || similarProduct._id;
                       const currentProductId = currentProduct.id || currentProduct._id;
                       
@@ -754,11 +804,12 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                   </div>
                 </div>
 
-                {similarProducts.length === CAROUSEL_PAGE_SIZE && (
+                {allSimilarProducts.length > (carouselPage + 1) * CAROUSEL_PAGE_SIZE && (
                   <button 
                     className="carousel-nav next" 
                     onClick={handleCarouselNext}
                     aria-label="Next products"
+                    disabled={isTransitioning}
                   >
                     &#8250;
                   </button>
