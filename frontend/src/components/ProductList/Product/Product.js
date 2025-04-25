@@ -5,7 +5,7 @@ import './Product.css';
 
 const Product = ({ product }) => {
   const [showModal, setShowModal] = useState(false);
-  const { name, manufacturer, price, is_in_stoc } = product;
+  const { name, manufacturer, price, is_in_stoc, product_code } = product;
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -18,6 +18,19 @@ const Product = ({ product }) => {
   return (
     <>
       <div className="product-card">
+        {/* Product Image */}
+        <div className="product-image-container">
+          <img 
+            src={`/${product_code}.jpeg`} 
+            alt={name}
+            className="product-image"
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = '/placeholder.jpeg'; // Fallback to placeholder image
+            }}
+          />
+        </div>
+        
         <div className="product-header">
           <h3 className="product-name">{name}</h3>
           <span className={`product-stock ${is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>

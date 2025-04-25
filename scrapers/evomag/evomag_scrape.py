@@ -131,7 +131,7 @@ def format_data(item,driver):
                 img_data = requests.get(imageUrl).content
                 img_name = product_code + '.jpeg'
                 #
-                filepath = os.path.join('/home/tav/Desktop/licenta/frontend/public/images', img_name) 
+                filepath = os.path.join(config['Paths']['image_output'], img_name) 
                 with open(filepath, 'wb') as file:
                     file.write(img_data)
             except Exception as e:
