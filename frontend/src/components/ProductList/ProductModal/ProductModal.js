@@ -343,6 +343,13 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     }
   };
 
+  // Handle online store click to redirect to URL
+  const handleOnlineStoreClick = () => {
+    if (currentProduct && currentProduct.url) {
+      window.open(currentProduct.url, '_blank');
+    }
+  };
+
   // Helper function to determine price comparison class
   const getPriceComparisonClass = (relatedProductPrice) => {
     if (!currentProduct || !currentProduct.price || !relatedProductPrice) return '';
@@ -388,7 +395,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     is_in_stoc, 
     description, 
     product_code,
-    recommended_price
+    recommended_price,
+    online_mag,
+    url
   } = currentProduct;
 
   // Calculate y-axis domain
@@ -411,6 +420,20 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
           <div className="modal-top-info">
             <div className="modal-main-details">
               <div className="modal-price">{price?.toFixed(2)} RON</div>
+              {online_mag && (
+                <div 
+                  className="modal-online-store"
+                  onClick={handleOnlineStoreClick}
+                  style={{ 
+                    cursor: url ? 'pointer' : 'default',
+                    color: url ? '#1976d2' : 'inherit',
+                    textDecoration: url ? 'underline' : 'none'
+                  }}
+                >
+                  Store: {online_mag}
+                  {url && <span style={{ marginLeft: '5px', fontSize: '0.8em' }}>(click to visit)</span>}
+                </div>
+              )}
               <div className="modal-recommended-price">
                 <strong>Recommended Price:</strong> {recommended_price ? `${recommended_price.toFixed(2)} RON` : 'Not available'}
               </div>

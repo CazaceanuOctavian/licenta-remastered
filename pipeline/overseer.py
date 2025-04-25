@@ -211,7 +211,7 @@ def main():
         logger.critical(f"Critical error in main process: {str(e)}")
         logger.exception("Stack trace:")
         
-        execution_time = (datetime.now() - start_time).total_seconds()
+        execution_time = (datetime.now() - start_time).total_seconds()  
         logger.info(f"=== Product overseer process failed after {execution_time:.2f} seconds ===")
 
 if __name__ == '__main__':

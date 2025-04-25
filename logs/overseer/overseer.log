@@ -408,3 +408,37 @@ TypeError: MongoManager.update_recommended_price_from_list() missing 2 required 
 2025-03-24 04:13:27 - product_overseer - INFO - Successfully predicted prices of products of type: Telefoane
 2025-03-24 04:13:27 - product_overseer - INFO - Updating products with the new recommended price...
 2025-03-24 04:13:27 - product_overseer - INFO - === Product overseer process completed in 21744.35 seconds ===
+2025-04-03 22:12:32 - product_overseer - INFO - === Starting product overseer process ===
+2025-04-03 22:12:32 - product_overseer - INFO - Loading configuration files
+2025-04-03 22:12:32 - product_overseer - INFO - Running process for date: 2025_04_03
+2025-04-03 22:12:32 - product_overseer - INFO - Initializing managers
+2025-04-03 22:12:32 - product_overseer - INFO - Initializing Scraper manager
+2025-04-03 22:12:32 - product_overseer - INFO - Initializing MongoDB manager
+2025-04-03 22:12:32 - product_overseer - INFO - Successfully connected to MongoDB
+2025-04-03 22:12:32 - product_overseer - INFO - Initializing Regression managers
+2025-04-03 22:12:32 - product_overseer - INFO - Successfully initialized regression managers
+2025-04-03 22:12:32 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-04-03 22:12:33 - product_overseer - INFO - Email manager initialized
+2025-04-03 22:12:33 - product_overseer - INFO - Starting scraping and database update process
+2025-04-03 22:12:33 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds
+2025-04-04 04:12:34 - product_overseer - INFO - Scraping completed. Output files: /home/tav/licenta_remastered/scrapers/vexio/output//vexio_2025_04_03.json, /home/tav/licenta_remastered/scrapers/evomag/output//evomag_2025_04_03.json
+2025-04-04 04:12:35 - product_overseer - INFO - Retrieved 17686 products from scrapers
+2025-04-04 04:12:35 - product_overseer - INFO - Upserting 17686 products to app.products
+2025-04-04 04:12:44 - product_overseer - INFO - Database upsert completed successfully
+2025-04-04 04:12:44 - product_overseer - INFO - Starting user notification process
+2025-04-04 04:12:44 - product_overseer - INFO - Retrieved 3 users from database
+2025-04-04 04:12:44 - product_overseer - INFO - Starting email notification process for 3 users
+2025-04-04 04:12:44 - product_overseer - INFO - Checking price changes for 1 user products
+2025-04-04 04:12:44 - product_overseer - INFO - Found 0 products with price drops
+2025-04-04 04:12:44 - product_overseer - INFO - Checking price changes for 0 user products
+2025-04-04 04:12:44 - product_overseer - INFO - Found 0 products with price drops
+2025-04-04 04:12:44 - product_overseer - INFO - Checking price changes for 4 user products
+2025-04-04 04:12:44 - product_overseer - INFO - Price drop detected for product 82YU00YWRM from 1549.0 to 1497.99
+2025-04-04 04:12:44 - product_overseer - INFO - Price drop detected for product SM-A556BLVCEUE from 2120.99 to 2099.99
+2025-04-04 04:12:44 - product_overseer - INFO - Found 2 products with price drops
+2025-04-04 04:12:44 - product_overseer - INFO - Sending price drop notification to octavian.caz@gmail.com
+2025-04-04 04:12:44 - product_overseer - INFO - Email notification process completed. Sent 1 notifications
+2025-04-04 04:12:44 - product_overseer - INFO - Using regression model to predict prices of products of type: Telefoane
+2025-04-04 04:12:44 - product_overseer - INFO - Successfully predicted prices of products of type: Telefoane
+2025-04-04 04:12:44 - product_overseer - INFO - Updating products with the new recommended price...
+2025-04-04 04:12:44 - product_overseer - INFO - === Product overseer process completed in 21611.68 seconds ===
