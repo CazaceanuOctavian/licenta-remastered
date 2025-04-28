@@ -31,6 +31,8 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const [isInFavorites, setIsInFavorites] = useState(false);
   // State to track if adding to favorites
   const [addingToFavorites, setAddingToFavorites] = useState(false);
+  // State to track image loading errors
+  const [imageError, setImageError] = useState(false);
   
   // Carousel state
   const [similarProducts, setSimilarProducts] = useState([]);
@@ -65,6 +67,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       if (!initialProduct.price_history) {
         fetchFullProductDetails(initialProduct.id || initialProduct._id);
       }
+      
+      // Reset image error state when product changes
+      setImageError(false);
     }
   }, [initialProduct]);
 
@@ -107,9 +112,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
     };
   }, [globalState.product.emitter]);
-
-  // Remove the event listener for carousel products fetch
-  // since we're now fetching directly
 
   // Update displayed products when page changes or all similar products change
   useEffect(() => {
@@ -211,6 +213,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     if (isUserLoggedIn() && currentProduct && currentProduct.product_code) {
       checkIfInFavorites();
     }
+    
+    // Reset image error state when product changes
+    setImageError(false);
   }, [currentProduct]);
 
   // Check if the current product is in user's favorites
@@ -459,6 +464,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       // Clear similar products to force a new fetch and shuffle
       setAllSimilarProducts([]);
       setDisplayedProducts([]);
+      
+      // Reset image error state when product changes
+      setImageError(false);
     }
   };
 
@@ -467,6 +475,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     if (currentProduct && currentProduct.url) {
       window.open(currentProduct.url, '_blank');
     }
+  };
+
+  // Handle image loading error
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   // Helper function to determine price comparison class
@@ -549,6 +562,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Calculate y-axis domain
   const yAxisDomain = getYAxisDomain();
 
+  // Determine image source
+  const imageSrc = imageError || !product_code 
+    ? '/placeholder.jpeg' 
+    : `/${product_code}.jpeg`;
+
   return (
     <div className="product-modal-overlay" onClick={(e) => {
       // Close modal when clicking on the overlay (outside the modal content)
@@ -563,6 +581,15 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         </div>
         
         <div className="modal-content">
+          {/* Product Image */}
+          <div className="modal-product-image">
+            <img 
+              src={imageSrc} 
+              alt={name}
+              onError={handleImageError}
+            />
+          </div>
+          
           <div className="modal-top-info">
             <div className="modal-main-details">
               <div className="modal-price">{price?.toFixed(2)} RON</div>
