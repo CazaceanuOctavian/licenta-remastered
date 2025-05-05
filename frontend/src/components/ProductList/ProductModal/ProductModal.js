@@ -7,6 +7,7 @@ import './ProductModal.css';
 
 // Configuration constants
 const PRICE_TOLERANCE = 0.15; // 15% price tolerance for similar products
+const SPECS_PREVIEW_LIMIT = 10; // Show only this many specifications when collapsed
 
 const ProductModal = ({ product: initialProduct, onClose }) => {
   // Reference to the modal container for scrolling
@@ -37,6 +38,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Similar products state
   const [allSimilarProducts, setAllSimilarProducts] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  
+  // New state to track if specifications are expanded
+  const [specsExpanded, setSpecsExpanded] = useState(false);
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
@@ -63,6 +67,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       
       // Reset image error state when product changes
       setImageError(false);
+      
+      // Reset specifications expanded state when product changes
+      setSpecsExpanded(false);
     }
   }, [initialProduct]);
 
@@ -457,6 +464,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     setImageError(true);
   };
 
+  // Toggle specifications expanded state
+  const toggleSpecsExpanded = () => {
+    setSpecsExpanded(!specsExpanded);
+  };
+
   // Helper function to determine price comparison class
   const getPriceComparisonClass = (relatedProductPrice) => {
     if (!currentProduct || !currentProduct.price || !relatedProductPrice) return '';
@@ -506,6 +518,13 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     online_mag,
     url
   } = currentProduct;
+
+  // Get specifications entries
+  const specsEntries = specifications ? Object.entries(specifications) : [];
+  // Determine if we need to show the toggle button
+  const showSpecsToggle = specsEntries.length > SPECS_PREVIEW_LIMIT;
+  // Get the specifications to display based on current state
+  const specsToDisplay = specsExpanded ? specsEntries : specsEntries.slice(0, SPECS_PREVIEW_LIMIT);
 
   // Calculate y-axis domain
   const yAxisDomain = getYAxisDomain();
@@ -576,19 +595,33 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
             </div>
           )}
           
-          {specifications && Object.keys(specifications).length > 0 && (
+          {specsEntries.length > 0 && (
             <div className="modal-specifications">
               <h3>Specifications</h3>
-              <table>
-                <tbody>
-                  {Object.entries(specifications).map(([key, value]) => (
-                    <tr key={key}>
-                      <td className="spec-name">{key}</td>
-                      <td className="spec-value">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={`specifications-container ${specsExpanded ? 'expanded' : ''}`}>
+                <table>
+                  <tbody>
+                    {specsToDisplay.map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="spec-name">{key}</td>
+                        <td className="spec-value">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {/* Specifications toggle button */}
+                {showSpecsToggle && (
+                  <div className="specs-toggle-container">
+                    <button 
+                      className="specs-toggle-btn"
+                      onClick={toggleSpecsExpanded}
+                    >
+                      {specsExpanded ? 'Show Less' : 'Show All Specifications'}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
