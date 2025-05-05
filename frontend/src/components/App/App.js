@@ -13,6 +13,7 @@ import RegisterForm from '../RegisterForm/RegisterForm';
 import UserFetchDetailsForm from '../UserFetchDetailsForm/UserFetchDetailsForm';
 import ProductList from '../ProductList/ProductList';
 import ProductCarousel from '../ProductList/ProductCarousel';
+import HomeForm from '../HomeForm/HomeForm';
 
 
 const App = () => {
@@ -58,7 +59,7 @@ const App = () => {
         
         <Routes>
           <Route path='/' element= {
-            <UserFetchDetailsForm />
+            <HomeForm />
           } />
           <Route path='/login' element= {
             <LoginForm />

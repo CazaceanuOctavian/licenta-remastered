@@ -98,18 +98,36 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       console.error('Failed to remove product from favorites');
     };
     
-    // Add event listeners
+    // Set up event listeners for recent list operations
+    const handleRecentAddSuccess = () => {
+      console.log('Product added to recent list successfully');
+    };
+    
+    const handleRecentAddFail = () => {
+      console.error('Failed to add product to recent list');
+    };
+    
+    // Add event listeners for favorites
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
     globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
     globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
     
+    // Add event listeners for recent list
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
+    
     // Clean up event listeners on component unmount
     return () => {
+      // Clean up favorites listeners
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+      
+      // Clean up recent list listeners
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
     };
   }, [globalState.product.emitter]);
 
@@ -119,6 +137,20 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       fetchSimilarProducts();
     }
   }, [currentProduct]);
+
+  // Function to add product to recent list
+  const addToRecentList = async (productCode) => {
+    if (!isUserLoggedIn() || !productCode) {
+      return;
+    }
+    
+    try {
+      // Call the addProductToRecentList method from ProductStore
+      await globalState.product.addProductToRecentList(globalState, productCode);
+    } catch (error) {
+      console.error('Error adding to recent list:', error);
+    }
+  };
 
   // Function to fetch similar products directly using API
   const fetchSimilarProducts = async () => {
@@ -201,6 +233,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     // Check if product is in favorites when current product changes
     if (isUserLoggedIn() && currentProduct && currentProduct.product_code) {
       checkIfInFavorites();
+      
+      // Add the product to the recent list
+      addToRecentList(currentProduct.product_code);
     }
     
     // Reset image error state when product changes
@@ -533,7 +568,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const imageSrc = imageError || !product_code 
     ? '/placeholder.jpeg' 
     : `/${product_code}.jpeg`;
-
   return (
     <div className="product-modal-overlay" onClick={(e) => {
       // Close modal when clicking on the overlay (outside the modal content)

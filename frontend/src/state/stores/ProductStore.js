@@ -155,6 +155,53 @@ class ProductStore {
             this.emitter.emit("PRODUCT_ADD_TO_MAILING_LIST_FAIL")
         }
     }
+
+
+    //RECENT PRODUCTS LIST FUNCTIONS
+    // Add these new methods to your ProductStore class
+
+    async addProductToRecentList(state, productCode) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/recentProductList/${productCode}`, {
+                method: 'post',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            });
+            
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json();
+            this.emitter.emit("PRODUCT_ADD_TO_RECENT_LIST_SUCCESS");
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_ADD_TO_RECENT_LIST_FAIL');
+        }
+    }
+
+    async fetchRecentProducts(state) {
+        try {
+            const response = await fetch(`${SERVER}/api/users/recentProductList`, {
+                method: 'get',
+                headers: {
+                    authorization: state.user.data.token
+                }
+            });
+
+            if(!response.ok) {
+                throw response;
+            }
+
+            const content = await response.json();            
+            this.data = content.data;
+            this.emitter.emit("PRODUCT_FETCH_RECENT_SUCCESS");
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit("PRODUCT_FETCH_RECENT_FAIL");
+        }
+    }
     
 }
 
