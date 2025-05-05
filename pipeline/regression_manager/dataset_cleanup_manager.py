@@ -119,29 +119,12 @@ class DatasetCleanupManager:
         return df_model_training
     
     def __flatten_json_column(self, df, json_column):
-        """
-        Flatten a JSON column in a DataFrame so that the fields become separate columns.
-        
-        Parameters:
-        -----------
-        df : pandas.DataFrame
-            The DataFrame containing the JSON column to flatten
-        json_column : str
-            The name of the column containing the JSON data to flatten
-            
-        Returns:
-        --------
-        pandas.DataFrame
-            A new DataFrame with the JSON column flattened into separate columns
-        """
-        # Create a copy to avoid modifying the original DataFrame
         result_df = df.copy()
         
         # Check if the JSON column exists in the DataFrame
         if json_column not in result_df.columns:
             raise ValueError(f"Column '{json_column}' not found in DataFrame")
         
-        # Normalize the JSON column
         try:
             # Handle cases where some rows might have None/NaN values in the JSON column
             mask = result_df[json_column].notna()
