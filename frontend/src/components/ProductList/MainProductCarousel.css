@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 50px; /* Space for navigation buttons */
+    padding: 0 40px; /* Reduced padding */
   }
   
   .carousel-container {
@@ -27,10 +27,16 @@
   
   .carousel-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(5, minmax(0, 1fr)); /* Ensure equal width columns */
+    gap: 10px; /* Reduced gap */
     transition: transform 0.3s ease-in-out;
     align-items: stretch;
+  }
+  
+  /* Force all direct children of carousel grid to have same height and width */
+  .carousel-grid > * {
+    height: auto;
+    width: 100%; /* Ensure all cards take full width of their grid cell */
   }
   
   .carousel-nav {
@@ -40,12 +46,12 @@
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 30px; /* Reduced size */
+    height: 30px; /* Reduced size */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 18px; /* Reduced font size */
     color: #333;
     cursor: pointer;
     z-index: 1;
@@ -140,28 +146,28 @@
   /* Media queries for responsive design */
   @media (max-width: 1200px) {
     .carousel-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   
   @media (max-width: 900px) {
     .carousel-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   
   @media (max-width: 600px) {
     .carousel-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     
     .product-carousel {
-      padding: 0 30px; /* Less padding on mobile */
+      padding: 0 25px; /* Less padding on mobile */
     }
     
     .carousel-nav {
-      width: 30px;
-      height: 30px;
-      font-size: 18px;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
     }
   }
