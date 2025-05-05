@@ -6,7 +6,6 @@ const apiRouter = express.Router()
 
 //PRODUCTS
 apiRouter.get('/products', controllers.product.getAllProductsFiltered)
-
 //USER PRODUCT LIST
 apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
 apiRouter.delete('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.deleteProductFromUserList)
@@ -15,6 +14,8 @@ apiRouter.get('/users/userProductList/:pcode', middleware.authMiddleware, contro
 //USER PRODUCT LIST --> MAIL NOTIFICATION SERVICE 
 apiRouter.post('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.addProcutToNotificationService)
 apiRouter.delete('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.removeProductFromNotificationService)
+//USER RECENTS LIST 
+apiRouter.post('/users/recentProductList/:pcode', middleware.authMiddleware, controllers.userRecentProductList.insertIntoRecentProducts)
 //USERS
 apiRouter.get('/users', 
             middleware.authMiddleware, 

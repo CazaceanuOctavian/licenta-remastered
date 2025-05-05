@@ -33,6 +33,13 @@ const createUserEntity = () => {
         default: false
       }
     }],
+    recentProducts: [{
+      product_code: {
+        type: String,
+        required: true,
+        trim: true
+      }
+    }],
     createdAt: {
       type: Date,
       default: Date.now
