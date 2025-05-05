@@ -16,6 +16,7 @@ apiRouter.post('/users/userProductList/mailing/:pcode', middleware.authMiddlewar
 apiRouter.delete('/users/userProductList/mailing/:pcode', middleware.authMiddleware, controllers.userList.removeProductFromNotificationService)
 //USER RECENTS LIST 
 apiRouter.post('/users/recentProductList/:pcode', middleware.authMiddleware, controllers.userRecentProductList.insertIntoRecentProducts)
+apiRouter.get('/users/recentProductList', middleware.authMiddleware, controllers.userRecentProductList.getRecentProducts)
 //USERS
 apiRouter.get('/users', 
             middleware.authMiddleware, 
