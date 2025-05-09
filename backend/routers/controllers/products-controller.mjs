@@ -77,8 +77,33 @@ const getAllProductsFiltered = async (req, res, next) => {
       query = query.select('-specifications')
     }
     
-    // Execute query
+    // Execute query and get products
     const products = await query.exec()
+    
+    if (products.length > 0) {
+      // Prepare update object - always increment impressions
+      const updateObj = { $inc: { impressions: 1 } };
+      
+      // Check if views should be incremented based on query param
+      const shouldIncrementViews = req.query.incrementViews === 'true';
+      if (shouldIncrementViews) {
+        updateObj.$inc.views = 1;
+      }
+      
+      // Using updateMany to increment counts for all returned products
+      await models.Product.updateMany(
+        { _id: { $in: products.map(product => product._id) } },
+        updateObj
+      );
+      
+      // Update the products in response to reflect the new counts
+      for (const product of products) {
+        product.impressions = (product.impressions || 0) + 1;
+        if (shouldIncrementViews) {
+          product.views = (product.views || 0) + 1;
+        }
+      }
+    }
     
     res.status(200).json({ data: products, count })
   } catch (err) {
