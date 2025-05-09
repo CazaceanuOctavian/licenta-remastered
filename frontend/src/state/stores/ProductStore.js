@@ -162,7 +162,7 @@ class ProductStore {
 
     async getProductsByViews(order = 'desc', limit = '') {
         try {
-            const response = await fetch(`${SERVER}/api/products/by-views?order=${order}&limit=${limit}`);
+            const response = await fetch(`${SERVER}/api/products/views?order=${order}&limit=${limit}`);
             
             if (!response.ok) {
                 throw response;

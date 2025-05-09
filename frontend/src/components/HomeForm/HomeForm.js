@@ -21,6 +21,10 @@ const HomeForm = () => {
   const [topManufacturerName, setTopManufacturerName] = useState('');
   const [loadingTopManufacturer, setLoadingTopManufacturer] = useState(false);
   
+  // State for most viewed products
+  const [mostViewedProducts, setMostViewedProducts] = useState([]);
+  const [loadingMostViewed, setLoadingMostViewed] = useState(false);
+  
   // State for selected product and modal
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -33,6 +37,20 @@ const HomeForm = () => {
       globalState.user.data.token && 
       globalState.user.data.id
     );
+  };
+
+  // Fetch most viewed products
+  const fetchMostViewedProducts = async () => {
+    try {
+      setLoadingMostViewed(true);
+      // Use the existing getProductsByViews method from the store
+      const result = await globalState.product.getProductsByViews('desc', 30);
+      setMostViewedProducts(result.data);
+    } catch (error) {
+      console.error('Error fetching most viewed products:', error);
+    } finally {
+      setLoadingMostViewed(false);
+    }
   };
 
   // Fetch recent products when component mounts
@@ -104,6 +122,17 @@ const HomeForm = () => {
       setLoadingTopManufacturer(false);
     };
     
+    // Set up event listener for most viewed products
+    const handleMostViewedSuccess = () => {
+      // This is just a backup in case we want to use the event emitter approach later
+      console.log('Most viewed products successfully fetched');
+    };
+    
+    const handleMostViewedFail = () => {
+      console.error('Failed to fetch most viewed products');
+      setLoadingMostViewed(false);
+    };
+    
     // Add event listeners
     globalState.product.emitter.addListener('PRODUCT_FETCH_RECENT_SUCCESS', handleRecentSuccess);
     globalState.product.emitter.addListener('PRODUCT_FETCH_RECENT_FAIL', handleRecentFail);
@@ -111,9 +140,12 @@ const HomeForm = () => {
     globalState.product.emitter.addListener('PRODUCT_RECOMMENDATIONS_FAIL', handleRecommendationsFail);
     globalState.product.emitter.addListener('PRODUCT_TOP_CATEGORY_SUCCESS', handleTopManufacturerSuccess);
     globalState.product.emitter.addListener('PRODUCT_TOP_CATEGORY_FAIL', handleTopManufacturerFail);
+    globalState.product.emitter.addListener('PRODUCT_GET_BY_VIEWS_SUCCESS', handleMostViewedSuccess);
+    globalState.product.emitter.addListener('PRODUCT_GET_BY_VIEWS_ERROR', handleMostViewedFail);
     
     // Fetch data
     fetchRecentProducts();
+    fetchMostViewedProducts(); // Fetch most viewed products
     
     // Clean up event listeners on component unmount
     return () => {
@@ -123,16 +155,19 @@ const HomeForm = () => {
       globalState.product.emitter.removeAllListeners('PRODUCT_RECOMMENDATIONS_FAIL', handleRecommendationsFail);
       globalState.product.emitter.removeAllListeners('PRODUCT_TOP_CATEGORY_SUCCESS', handleTopManufacturerSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_TOP_CATEGORY_FAIL', handleTopManufacturerFail);
+      globalState.product.emitter.removeAllListeners('PRODUCT_GET_BY_VIEWS_SUCCESS', handleMostViewedSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_GET_BY_VIEWS_ERROR', handleMostViewedFail);
     };
   }, [globalState]);
 
   // Handle product click
   const handleProductClick = (productId) => {
-    // Find the selected product from the recentProducts, recommendedProducts, or topManufacturerProducts array
+    // Find the selected product from all product arrays
     const product = 
       recentProducts.find(product => (product.id || product._id) === productId) ||
       recommendedProducts.find(product => (product.id || product._id) === productId) ||
-      topManufacturerProducts.find(product => (product.id || product._id) === productId);
+      topManufacturerProducts.find(product => (product.id || product._id) === productId) ||
+      mostViewedProducts.find(product => (product.id || product._id) === productId);
     
     if (product) {
       setSelectedProduct(product);
@@ -158,6 +193,23 @@ const HomeForm = () => {
       <div className="welcome-section">
         <h1>Welcome to Product Price Tracker</h1>
         <p>Track prices, compare products, and get the best deals!</p>
+      </div>
+      
+      {/* Most Viewed Products Section - Always visible regardless of login status */}
+      <div className="most-viewed-section">
+        <h2>Most Popular Products</h2>
+        <p className="most-viewed-description">
+          Check out the products that other users are viewing the most:
+        </p>
+        <ProductCarousel
+          products={mostViewedProducts}
+          loading={loadingMostViewed}
+          noItemsMessage="We're gathering data on popular products. Please check back soon!"
+          title=""
+          currentProductId={null}
+          onProductClick={handleProductClick}
+          getPriceComparisonClass={getPriceComparisonClass}
+        />
       </div>
       
       {isUserLoggedIn() ? (
