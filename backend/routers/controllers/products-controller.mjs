@@ -80,36 +80,65 @@ const getAllProductsFiltered = async (req, res, next) => {
     // Execute query and get products
     const products = await query.exec()
     
-    if (products.length > 0) {
-      // Prepare update object - always increment impressions
-      const updateObj = { $inc: { impressions: 1 } };
-      
-      // Check if views should be incremented based on query param
-      const shouldIncrementViews = req.query.incrementViews === 'true';
-      if (shouldIncrementViews) {
-        updateObj.$inc.views = 1;
-      }
-      
-      // Using updateMany to increment counts for all returned products
-      await models.Product.updateMany(
-        { _id: { $in: products.map(product => product._id) } },
-        updateObj
-      );
-      
-      // Update the products in response to reflect the new counts
-      for (const product of products) {
-        product.impressions = (product.impressions || 0) + 1;
-        if (shouldIncrementViews) {
-          product.views = (product.views || 0) + 1;
-        }
-      }
-    }
-    
     res.status(200).json({ data: products, count })
   } catch (err) {
     next(err)
   }
 }
+
+const incrementProductViews = async (req, res, next) => {
+  try {
+    const productId = req.params.pid;
+    
+    // Find the product and increment its views
+    const product = await models.Product.findByIdAndUpdate(
+      productId,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    
+    if (product) {
+      res.status(200).json({ 
+        success: true,
+        views: product.views 
+      });
+    } else {
+      res.status(404).json({ 
+        success: false,
+        message: 'Product not found' 
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const incrementProductImpressions = async (req, res, next) => {
+  try {
+    const productId = req.params.pid;
+    
+    // Find the product and increment its impressions
+    const product = await models.Product.findByIdAndUpdate(
+      productId,
+      { $inc: { impressions: 1 } },
+      { new: true }
+    );
+    
+    if (product) {
+      res.status(200).json({ 
+        success: true,
+        impressions: product.impressions 
+      });
+    } else {
+      res.status(404).json({ 
+        success: false,
+        message: 'Product not found' 
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
 const updateProduct = async (req, res, next) => {
   try {
@@ -145,6 +174,8 @@ const deleteProduct = async (req, res, next) => {
 
 export default {
   getAllProductsFiltered,
+  incrementProductViews,
+  incrementProductImpressions,
   updateProduct,
   deleteProduct
 }

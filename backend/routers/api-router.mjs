@@ -6,6 +6,9 @@ const apiRouter = express.Router()
 
 //PRODUCTS
 apiRouter.get('/products', controllers.product.getAllProductsFiltered)
+//PRODUCTS VIEWS & IMPRESSIONS
+apiRouter.post('/products/:pid/views', controllers.product.incrementProductViews)
+apiRouter.post('/products/:pid/impressions', controllers.product.incrementProductImpressions)
 //USER PRODUCT LIST
 apiRouter.post('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.saveProductToUserList)
 apiRouter.delete('/users/userProductList/:pcode', middleware.authMiddleware, controllers.userList.deleteProductFromUserList)
