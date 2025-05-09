@@ -41,6 +41,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   
   // New state to track if specifications are expanded
   const [specsExpanded, setSpecsExpanded] = useState(false);
+  
+  // New state to track view count
+  const [viewCount, setViewCount] = useState(0);
+  // Flag to track if view has been incremented for current product
+  const [viewIncremented, setViewIncremented] = useState(false);
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
@@ -60,7 +65,7 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         [initialProduct.id || initialProduct._id]: initialProduct
       }));
       
-      // Check if we need to fetch the full product (including price history)
+      // Check if we need to fetch the full product details (including price history)
       if (!initialProduct.price_history) {
         fetchFullProductDetails(initialProduct.id || initialProduct._id);
       }
@@ -107,6 +112,16 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       console.error('Failed to add product to recent list');
     };
     
+    // Set up event listeners for view increment
+    const handleViewIncrementSuccess = (data) => {
+      console.log('Product views incremented successfully', data);
+      setViewCount(data.views);
+    };
+    
+    const handleViewIncrementError = () => {
+      console.error('Failed to increment product views');
+    };
+    
     // Add event listeners for favorites
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
@@ -116,6 +131,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     // Add event listeners for recent list
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
+    
+    // Add event listeners for view increment
+    globalState.product.emitter.addListener('PRODUCT_INCREMENT_VIEWS_SUCCESS', handleViewIncrementSuccess);
+    globalState.product.emitter.addListener('PRODUCT_INCREMENT_VIEWS_ERROR', handleViewIncrementError);
     
     // Clean up event listeners on component unmount
     return () => {
@@ -128,6 +147,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       // Clean up recent list listeners
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
+      
+      // Clean up view increment listeners
+      globalState.product.emitter.removeAllListeners('PRODUCT_INCREMENT_VIEWS_SUCCESS', handleViewIncrementSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_INCREMENT_VIEWS_ERROR', handleViewIncrementError);
     };
   }, [globalState.product.emitter]);
 
@@ -137,6 +160,35 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       fetchSimilarProducts();
     }
   }, [currentProduct]);
+
+  // Create a stable reference to store product IDs that have already been incremented
+  const incrementedProductIds = useRef(new Set());
+  
+  // Increment view count when product is viewed - using a stable pattern that works with StrictMode
+  useEffect(() => {
+    if (!currentProduct) return;
+    
+    const productId = currentProduct.id || currentProduct._id;
+    
+    // Only increment if we haven't already incremented this specific product ID
+    if (productId && !incrementedProductIds.current.has(productId)) {
+      // Add the product ID to our Set to prevent duplicate calls
+      incrementedProductIds.current.add(productId);
+      
+      // Now it's safe to call the API
+      incrementProductViews(productId);
+      console.log(`View count incremented for product ID: ${productId}`);
+    }
+  }, [currentProduct]);
+
+  // Function to increment product views
+  const incrementProductViews = async (productId) => {
+    try {
+      await globalState.product.incrementProductViews(productId);
+    } catch (error) {
+      console.error('Error incrementing product views:', error);
+    }
+  };
 
   // Function to add product to recent list
   const addToRecentList = async (productCode) => {
@@ -615,6 +667,10 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                 {is_in_stoc ? 'In Stock' : 'Out of Stock'}
               </div>
               {product_code && <div className="modal-product-code">Product Code: {product_code}</div>}
+              {/* Add view count display */}
+              <div className="modal-view-count">
+                <strong>Views:</strong> {viewCount > 0 ? viewCount : 'Loading...'}
+              </div>
             </div>
 
             <div className="modal-manufacturer">

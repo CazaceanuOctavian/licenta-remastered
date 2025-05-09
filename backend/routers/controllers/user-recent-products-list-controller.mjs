@@ -20,33 +20,28 @@ const insertIntoRecentProducts = async (req, res, next) => {
         // Maximum number of recent products to store
         const MAX_RECENT_PRODUCTS = 30;
 
-        // Initialize recentProducts array if it doesn't exist
-        if (!req.user.recentProducts) {
-            req.user.recentProducts = [];
-        }
-
-        // Check if product is already in recent products
-        const existingIndex = req.user.recentProducts.findIndex(
-            recentProduct => recentProduct.product_code === productCode
+        // Instead of modifying and saving req.user, use findOneAndUpdate with the $push operator
+        const result = await models.User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $pull: { recentProducts: { product_code: productCode } }
+            },
+            { new: true }
         );
 
-        // If product exists in the list, remove it
-        if (existingIndex !== -1) {
-            req.user.recentProducts.splice(existingIndex, 1);
-        }
-
-        // Add product to the beginning of the array with the correct schema structure
-        req.user.recentProducts.unshift({
-            product_code: productCode
-        });
-
-        // Trim the array if it exceeds the maximum size
-        if (req.user.recentProducts.length > MAX_RECENT_PRODUCTS) {
-            req.user.recentProducts = req.user.recentProducts.slice(0, MAX_RECENT_PRODUCTS);
-        }
-
-        // Save the updated user
-        await req.user.save();
+        await models.User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $push: { 
+                    recentProducts: { 
+                        $each: [{ product_code: productCode }],
+                        $position: 0,
+                        $slice: MAX_RECENT_PRODUCTS
+                    } 
+                }
+            },
+            { new: true }
+        );
 
         return res.status(200).json({
             message: 'Product added to recent products',

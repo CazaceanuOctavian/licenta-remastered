@@ -11,7 +11,7 @@ const createProductEntity = () => {
       type: String,
       required: true
     }
-  }, { _id: false }) // _id: false prevents MongoDB from creating IDs for each price history entry
+  }, { _id: false }) 
 
   const productSchema = new mongoose.Schema({
     timestamp: {
@@ -27,12 +27,10 @@ const createProductEntity = () => {
       type: Number,
       required: true
     },
-    // Add the recommended_price field as an optional float
     recommended_price: {
       type: Number,
       required: false
     },
-    // Add the price_history field as an array of price history objects
     price_history: {
       type: [priceHistorySchema],
       default: []
@@ -42,6 +40,14 @@ const createProductEntity = () => {
       default: 0
     },
     number_of_reviews: {
+      type: Number,
+      default: 0
+    },
+    views: {
+      type: Number,
+      default: 0
+    },
+    impressions: {
       type: Number,
       default: 0
     },
@@ -86,7 +92,6 @@ const createProductEntity = () => {
     timestamps: true // Automatically manage createdAt and updatedAt
   })
 
-  // Adding indexes for common query fields
   productSchema.index({ manufacturer: 1 })
   productSchema.index({ category: 1 })
   productSchema.index({ product_code: 1 })
