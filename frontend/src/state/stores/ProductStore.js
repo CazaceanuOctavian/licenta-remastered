@@ -158,6 +158,48 @@ class ProductStore {
         }
     }
 
+    //PRODUCT VIEWS & IMPRESSIONS SECTION
+
+    async incrementProductViews(productId) {
+        try {
+          const response = await fetch(`${SERVER}/api/products/${productId}/views`, {
+            method: 'PUT'
+          });
+          
+          if (!response.ok) {
+            throw response;
+          }
+          
+          const content = await response.json();
+          this.emitter.emit('PRODUCT_INCREMENT_VIEWS_SUCCESS', content);
+          return content.views;
+        } catch (err) {
+          console.warn(err);
+          this.emitter.emit('PRODUCT_INCREMENT_VIEWS_ERROR');
+          throw err;
+        }
+      }
+      
+      async incrementProductImpressions(productId) {
+        try {
+          const response = await fetch(`${SERVER}/api/products/${productId}/impressions`, {
+            method: 'PUT'
+          });
+          
+          if (!response.ok) {
+            throw response;
+          }
+          
+          const content = await response.json();
+          this.emitter.emit('PRODUCT_INCREMENT_IMPRESSIONS_SUCCESS', content);
+          return content.impressions;
+        } catch (err) {
+          console.warn(err);
+          this.emitter.emit('PRODUCT_INCREMENT_IMPRESSIONS_ERROR');
+          throw err;
+        }
+      }
+
 
     //RECENT PRODUCTS LIST FUNCTIONS
     // Add these new methods to your ProductStore class
