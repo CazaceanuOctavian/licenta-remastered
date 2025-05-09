@@ -1,0 +1,173 @@
+.product-carousel-section {
+    margin-top: 2rem;
+    margin-bottom: 30px;
+  }
+  
+  .product-carousel-section h3 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+  }
+  
+  .product-carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px; /* Reduced padding */
+  }
+  
+  .carousel-container {
+    overflow: hidden;
+    max-width: 100%;
+    flex: 1;
+  }
+  
+  .carousel-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr)); /* Ensure equal width columns */
+    gap: 10px; /* Reduced gap */
+    transition: transform 0.3s ease-in-out;
+    align-items: stretch;
+  }
+  
+  /* Force all direct children of carousel grid to have same height and width */
+  .carousel-grid > * {
+    height: auto;
+    width: 100%; /* Ensure all cards take full width of their grid cell */
+  }
+  
+  .carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 50%;
+    width: 30px; /* Reduced size */
+    height: 30px; /* Reduced size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px; /* Reduced font size */
+    color: #333;
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .carousel-nav:hover {
+    background: #f5f5f5;
+    color: #1976d2;
+  }
+  
+  .carousel-nav.prev {
+    left: 0;
+  }
+  
+  .carousel-nav.next {
+    right: 0;
+  }
+  
+  .carousel-nav:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .carousel-loading, .no-carousel-products {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+  }
+  
+  /* Sliding animation classes */
+  .slide-left {
+    transform: translateX(-100%);
+  }
+  
+  .slide-right {
+    transform: translateX(100%);
+  }
+  
+  /* Fade in animation for new content */
+  .carousel-grid:not(.slide-left):not(.slide-right) {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideLeft {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes slideRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+  
+  /* Loading State */
+  .carousel-loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+  
+  /* No Similar Products */
+  .no-carousel-products {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+  }
+  
+  /* Media queries for responsive design */
+  @media (max-width: 1200px) {
+    .carousel-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .carousel-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .carousel-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    .product-carousel {
+      padding: 0 25px; /* Less padding on mobile */
+    }
+    
+    .carousel-nav {
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+    }
+  }

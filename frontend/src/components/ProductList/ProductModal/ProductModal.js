@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ProductCarousel from './../MainProductCarousel'; // Import the new component
 import AppContext from '../../../state/AppContext';
 import { SERVER } from '../../../config/global';
 import './ProductModal.css';
 
 // Configuration constants
 const PRICE_TOLERANCE = 0.15; // 15% price tolerance for similar products
-const CAROUSEL_PAGE_SIZE = 4; // Items per page in carousel
+const SPECS_PREVIEW_LIMIT = 10; // Show only this many specifications when collapsed
 
 const ProductModal = ({ product: initialProduct, onClose }) => {
   // Reference to the modal container for scrolling
@@ -34,16 +35,12 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // State to track image loading errors
   const [imageError, setImageError] = useState(false);
   
-  // Carousel state
-  const [similarProducts, setSimilarProducts] = useState([]);
-  const [carouselPage, setCarouselPage] = useState(0);
+  // Similar products state
+  const [allSimilarProducts, setAllSimilarProducts] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
-  const [totalSimilarProducts, setTotalSimilarProducts] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [slideDirection, setSlideDirection] = useState('left');
-  const [allSimilarProducts, setAllSimilarProducts] = useState([]); // All fetched products
-  const [displayedProducts, setDisplayedProducts] = useState([]); // Products currently shown
-
+  
+  // New state to track if specifications are expanded
+  const [specsExpanded, setSpecsExpanded] = useState(false);
 
   // Check if user is logged in
   const isUserLoggedIn = () => {
@@ -70,6 +67,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       
       // Reset image error state when product changes
       setImageError(false);
+      
+      // Reset specifications expanded state when product changes
+      setSpecsExpanded(false);
     }
   }, [initialProduct]);
 
@@ -98,37 +98,59 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       console.error('Failed to remove product from favorites');
     };
     
-    // Add event listeners
+    // Set up event listeners for recent list operations
+    const handleRecentAddSuccess = () => {
+      console.log('Product added to recent list successfully');
+    };
+    
+    const handleRecentAddFail = () => {
+      console.error('Failed to add product to recent list');
+    };
+    
+    // Add event listeners for favorites
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
     globalState.product.emitter.addListener('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
     globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
     globalState.product.emitter.addListener('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
     
+    // Add event listeners for recent list
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
+    globalState.product.emitter.addListener('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
+    
     // Clean up event listeners on component unmount
     return () => {
+      // Clean up favorites listeners
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_SUCCESS', handleAddSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_USER_LIST_FAIL', handleAddFail);
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_SUCCESS', handleRemoveSuccess);
       globalState.product.emitter.removeAllListeners('PRODUCT_REMOVE_FROM_USER_LIST_FAIL', handleRemoveFail);
+      
+      // Clean up recent list listeners
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_SUCCESS', handleRecentAddSuccess);
+      globalState.product.emitter.removeAllListeners('PRODUCT_ADD_TO_RECENT_LIST_FAIL', handleRecentAddFail);
     };
   }, [globalState.product.emitter]);
-
-  // Update displayed products when page changes or all similar products change
-  useEffect(() => {
-    if (allSimilarProducts.length > 0) {
-      const startIndex = carouselPage * CAROUSEL_PAGE_SIZE;
-      const endIndex = startIndex + CAROUSEL_PAGE_SIZE;
-      const pageProducts = allSimilarProducts.slice(startIndex, endIndex);
-      setDisplayedProducts(pageProducts);
-    }
-  }, [carouselPage, allSimilarProducts]);
 
   // Fetch similar products when current product changes
   useEffect(() => {
     if (currentProduct) {
       fetchSimilarProducts();
     }
-  }, [currentProduct]); // Only fetch when product changes, not when page changes
+  }, [currentProduct]);
+
+  // Function to add product to recent list
+  const addToRecentList = async (productCode) => {
+    if (!isUserLoggedIn() || !productCode) {
+      return;
+    }
+    
+    try {
+      // Call the addProductToRecentList method from ProductStore
+      await globalState.product.addProductToRecentList(globalState, productCode);
+    } catch (error) {
+      console.error('Error adding to recent list:', error);
+    }
+  };
 
   // Function to fetch similar products directly using API
   const fetchSimilarProducts = async () => {
@@ -194,7 +216,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
       }
       
       setAllSimilarProducts(shuffledProducts);
-      setTotalSimilarProducts(shuffledProducts.length);
       setLoadingSimilar(false);
       
     } catch (error) {
@@ -212,6 +233,9 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     // Check if product is in favorites when current product changes
     if (isUserLoggedIn() && currentProduct && currentProduct.product_code) {
       checkIfInFavorites();
+      
+      // Add the product to the recent list
+      addToRecentList(currentProduct.product_code);
     }
     
     // Reset image error state when product changes
@@ -458,13 +482,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
         fetchFullProductDetails(productId);
       }
       
-      // Reset carousel page to 0 when switching products
-      setCarouselPage(0);
-      
-      // Clear similar products to force a new fetch and shuffle
-      setAllSimilarProducts([]);
-      setDisplayedProducts([]);
-      
       // Reset image error state when product changes
       setImageError(false);
     }
@@ -480,6 +497,11 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   // Handle image loading error
   const handleImageError = () => {
     setImageError(true);
+  };
+
+  // Toggle specifications expanded state
+  const toggleSpecsExpanded = () => {
+    setSpecsExpanded(!specsExpanded);
   };
 
   // Helper function to determine price comparison class
@@ -515,33 +537,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     ];
   };
 
-  // Handle carousel navigation
-  const handleCarouselNext = () => {
-    if (isTransitioning) return;
-    
-    setIsTransitioning(true);
-    setSlideDirection('left');
-    
-    // Wait for animation to complete before updating page
-    setTimeout(() => {
-      setCarouselPage(prev => prev + 1);
-      setIsTransitioning(false);
-    }, 300); // Match CSS transition duration
-  };
-
-  const handleCarouselPrev = () => {
-    if (isTransitioning) return;
-    
-    setIsTransitioning(true);
-    setSlideDirection('right');
-    
-    // Wait for animation to complete before updating page
-    setTimeout(() => {
-      setCarouselPage(prev => Math.max(0, prev - 1));
-      setIsTransitioning(false);
-    }, 300); // Match CSS transition duration
-  };
-
   // Early return if no product
   if (!currentProduct) return null;
 
@@ -559,6 +554,13 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
     url
   } = currentProduct;
 
+  // Get specifications entries
+  const specsEntries = specifications ? Object.entries(specifications) : [];
+  // Determine if we need to show the toggle button
+  const showSpecsToggle = specsEntries.length > SPECS_PREVIEW_LIMIT;
+  // Get the specifications to display based on current state
+  const specsToDisplay = specsExpanded ? specsEntries : specsEntries.slice(0, SPECS_PREVIEW_LIMIT);
+
   // Calculate y-axis domain
   const yAxisDomain = getYAxisDomain();
 
@@ -566,7 +568,6 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
   const imageSrc = imageError || !product_code 
     ? '/placeholder.jpeg' 
     : `/${product_code}.jpeg`;
-
   return (
     <div className="product-modal-overlay" onClick={(e) => {
       // Close modal when clicking on the overlay (outside the modal content)
@@ -628,19 +629,33 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
             </div>
           )}
           
-          {specifications && Object.keys(specifications).length > 0 && (
+          {specsEntries.length > 0 && (
             <div className="modal-specifications">
               <h3>Specifications</h3>
-              <table>
-                <tbody>
-                  {Object.entries(specifications).map(([key, value]) => (
-                    <tr key={key}>
-                      <td className="spec-name">{key}</td>
-                      <td className="spec-value">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={`specifications-container ${specsExpanded ? 'expanded' : ''}`}>
+                <table>
+                  <tbody>
+                    {specsToDisplay.map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="spec-name">{key}</td>
+                        <td className="spec-value">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {/* Specifications toggle button */}
+                {showSpecsToggle && (
+                  <div className="specs-toggle-container">
+                    <button 
+                      className="specs-toggle-btn"
+                      onClick={toggleSpecsExpanded}
+                    >
+                      {specsExpanded ? 'Show Less' : 'Show All Specifications'}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
@@ -736,33 +751,16 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
                     <span>Higher price than current product</span>
                   </div>
                 </div>
-                <div className="related-products-grid">
-                  {relatedProducts.map((relatedProduct) => {
-                    const productId = relatedProduct.id || relatedProduct._id;
-                    return (
-                      <div 
-                        className={`related-product-card ${getPriceComparisonClass(relatedProduct.price)}`} 
-                        key={productId}
-                        onClick={() => handleProductSwitch(productId)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <div className="related-product-name">{relatedProduct.name}</div>
-                        <div className="related-product-info">
-                          <div className="related-product-price">{relatedProduct.price?.toFixed(2)} RON</div>
-                          <div className={`related-product-stock ${relatedProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
-                            {relatedProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
-                          </div>
-                        </div>
-                        {Object.entries(relatedProduct.specifications || {}).slice(0, 3).map(([key, value]) => (
-                          <div className="related-product-spec" key={key}>
-                            <span className="related-spec-name">{key}:</span> {value}
-                          </div>
-                        ))}
-                        <div className="view-product-hint">Click to view this product</div>
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* Using the ProductCarousel component for related products */}
+                <ProductCarousel
+                  products={relatedProducts}
+                  loading={false}
+                  title=""
+                  noItemsMessage="No related products found."
+                  currentProductId={currentProduct.id || currentProduct._id}
+                  onProductClick={handleProductSwitch}
+                  getPriceComparisonClass={getPriceComparisonClass}
+                />
               </>
             ) : (
               <div className="no-related-products">
@@ -774,79 +772,18 @@ const ProductModal = ({ product: initialProduct, onClose }) => {
             )}
           </div>
 
-          {/* Similar Products Carousel */}
+          {/* Similar Products Section using the ProductCarousel component */}
           <div className="modal-similar-products">
             <h3>Similar Products</h3>
-            {loadingSimilar ? (
-              <div className="similar-loading">Loading similar products...</div>
-            ) : displayedProducts.length > 0 ? (
-              <div className="similar-products-carousel">
-                {carouselPage > 0 && (
-                  <button 
-                    className="carousel-nav prev" 
-                    onClick={handleCarouselPrev}
-                    aria-label="Previous products"
-                    disabled={isTransitioning}
-                  >
-                    &#8249;
-                  </button>
-                )}
-                
-                <div className="carousel-container">
-                  <div 
-                    className={`carousel-grid ${isTransitioning ? `slide-${slideDirection}` : ''}`}
-                    style={{
-                      transform: isTransitioning ? 
-                        (slideDirection === 'left' ? 'translateX(-100%)' : 'translateX(100%)') : 
-                        'translateX(0)'
-                    }}
-                  >
-                    {displayedProducts.map((similarProduct) => {
-                      const productId = similarProduct.id || similarProduct._id;
-                      const currentProductId = currentProduct.id || currentProduct._id;
-                      
-                      // Skip the current product
-                      if (productId === currentProductId) return null;
-                      
-                      return (
-                        <div 
-                          className={`similar-product-card ${getPriceComparisonClass(similarProduct.price)}`} 
-                          key={productId}
-                          onClick={() => handleProductSwitch(productId)}
-                        >
-                          <div className="similar-product-name">{similarProduct.name}</div>
-                          <div className="similar-product-info">
-                            <div className="similar-product-price">{similarProduct.price?.toFixed(2)} RON</div>
-                            <div className={`similar-product-stock ${similarProduct.is_in_stoc ? 'in-stock' : 'out-of-stock'}`}>
-                              {similarProduct.is_in_stoc ? 'In Stock' : 'Out of Stock'}
-                            </div>
-                          </div>
-                          <div className="similar-product-manufacturer">
-                            By: {similarProduct.manufacturer}
-                          </div>
-                          <div className="view-product-hint">Click to view</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {allSimilarProducts.length > (carouselPage + 1) * CAROUSEL_PAGE_SIZE && (
-                  <button 
-                    className="carousel-nav next" 
-                    onClick={handleCarouselNext}
-                    aria-label="Next products"
-                    disabled={isTransitioning}
-                  >
-                    &#8250;
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="no-similar-products">
-                No similar products found.
-              </div>
-            )}
+            <ProductCarousel
+              products={allSimilarProducts}
+              loading={loadingSimilar}
+              title=""
+              noItemsMessage="No similar products found."
+              currentProductId={currentProduct.id || currentProduct._id}
+              onProductClick={handleProductSwitch}
+              getPriceComparisonClass={getPriceComparisonClass}
+            />
           </div>
         </div>
         
