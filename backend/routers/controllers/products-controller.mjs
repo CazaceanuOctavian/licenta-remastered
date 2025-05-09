@@ -86,6 +86,52 @@ const getAllProductsFiltered = async (req, res, next) => {
   }
 }
 
+/**
+ * Get products sorted by views with optional limit and sort direction
+ * @route GET /api/products/by-views
+ * @param {string} order - Sort order ('asc' or 'desc', defaults to 'desc')
+ * @param {number} limit - Maximum number of products to return
+ * @access Public
+ */
+const getProductsByViews = async (req, res, next) => {
+  try {
+    // Start building the query
+    let query = models.Product.find();
+    
+    // Get sort order from query params (default to descending)
+    const sortOrder = req.query.order && req.query.order.toLowerCase() === 'asc' ? 1 : -1;
+    
+    // Apply sorting by views
+    query = query.sort({ views: sortOrder });
+    
+    // Apply limit if provided
+    if (req.query.limit) {
+      const limit = parseInt(req.query.limit);
+      if (!isNaN(limit) && limit > 0) {
+        query = query.limit(limit);
+      }
+    }
+    
+    // Execute query and get products
+    const products = await query.exec();
+    
+    // Get total count for metadata
+    const count = products.length;
+    
+    res.status(200).json({ 
+      data: products, 
+      count,
+      metadata: {
+        sortedBy: 'views',
+        sortOrder: sortOrder === 1 ? 'ascending' : 'descending',
+        limit: req.query.limit ? parseInt(req.query.limit) : null
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 const incrementProductViews = async (req, res, next) => {
   try {
     const productId = req.params.pid;
@@ -174,6 +220,7 @@ const deleteProduct = async (req, res, next) => {
 
 export default {
   getAllProductsFiltered,
+  getProductsByViews,
   incrementProductViews,
   incrementProductImpressions,
   updateProduct,

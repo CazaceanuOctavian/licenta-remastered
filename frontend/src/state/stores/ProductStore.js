@@ -160,6 +160,29 @@ class ProductStore {
 
     //PRODUCT VIEWS & IMPRESSIONS SECTION
 
+    async getProductsByViews(order = 'desc', limit = '') {
+        try {
+            const response = await fetch(`${SERVER}/api/products/by-views?order=${order}&limit=${limit}`);
+            
+            if (!response.ok) {
+                throw response;
+            }
+            
+            const content = await response.json();
+            this.data = content.data;
+            this.emitter.emit('PRODUCT_GET_BY_VIEWS_SUCCESS');
+            return {
+                data: content.data,
+                count: content.count,
+                metadata: content.metadata
+            };
+        } catch (err) {
+            console.warn(err);
+            this.emitter.emit('PRODUCT_GET_BY_VIEWS_ERROR');
+            throw err;
+        }
+    }
+
     async incrementProductViews(productId) {
         try {
           const response = await fetch(`${SERVER}/api/products/${productId}/views`, {

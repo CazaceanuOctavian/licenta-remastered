@@ -6,6 +6,7 @@ const apiRouter = express.Router()
 
 //PRODUCTS
 apiRouter.get('/products', controllers.product.getAllProductsFiltered)
+apiRouter.get('/products/views', controllers.product.getProductsByViews)
 //PRODUCTS VIEWS & IMPRESSIONS
 apiRouter.put('/products/:pid/views', controllers.product.incrementProductViews)
 apiRouter.put('/products/:pid/impressions', controllers.product.incrementProductImpressions)
