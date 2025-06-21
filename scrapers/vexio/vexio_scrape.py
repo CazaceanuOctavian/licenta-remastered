@@ -30,7 +30,7 @@ except Exception as e:
 currentDate = datetime.datetime.now().strftime('%Y_%m_%d')
 
 config = configparser.ConfigParser()
-config.read('/home/tav/licenta_remastered/cfg.ini')
+config.read('/home/tav/Desktop/licenta/cfg.ini')
 
 latest_path = None
 output_file = os.path.join(config['Paths']['vexio_output'], f'vexio_{currentDate}.json')

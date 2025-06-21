@@ -478,3 +478,71 @@ TypeError: MongoManager.update_recommended_price_from_list() missing 2 required 
 2025-04-26 06:05:09 - product_overseer - INFO - Successfully predicted prices of products of type: Telefoane
 2025-04-26 06:05:09 - product_overseer - INFO - Updating products with the new recommended price...
 2025-04-26 06:05:09 - product_overseer - INFO - === Product overseer process completed in 21608.78 seconds ===
+2025-06-21 21:15:23 - product_overseer - INFO - === Starting product overseer process ===
+2025-06-21 21:15:23 - product_overseer - INFO - Loading configuration files
+2025-06-21 21:15:23 - product_overseer - INFO - Running process for date: 2025_06_21
+2025-06-21 21:15:23 - product_overseer - INFO - Initializing managers
+2025-06-21 21:15:23 - product_overseer - INFO - Initializing Scraper manager
+2025-06-21 21:15:23 - product_overseer - INFO - Initializing MongoDB manager
+2025-06-21 21:15:23 - product_overseer - CRITICAL - Critical error in main process: 'Mongo'
+2025-06-21 21:15:23 - product_overseer - ERROR - Stack trace:
+Traceback (most recent call last):
+  File "/home/tav/Desktop/licenta/pipeline/overseer.py", line 165, in main
+    database_manager = MongoManager(env_cfg['Mongo']['connection_string'])
+                                    ~~~~~~~^^^^^^^^^
+  File "/nix/store/26yi95240650jxp5dj78xzch70i1kzlz-python3-3.12.9/lib/python3.12/configparser.py", line 941, in __getitem__
+    raise KeyError(key)
+KeyError: 'Mongo'
+2025-06-21 21:15:23 - product_overseer - INFO - === Product overseer process failed after 0.00 seconds ===
+2025-06-21 21:33:40 - product_overseer - INFO - === Starting product overseer process ===
+2025-06-21 21:33:40 - product_overseer - INFO - Loading configuration files
+2025-06-21 21:33:40 - product_overseer - INFO - Running process for date: 2025_06_21
+2025-06-21 21:33:40 - product_overseer - INFO - Initializing managers
+2025-06-21 21:33:40 - product_overseer - INFO - Initializing Scraper manager
+2025-06-21 21:33:40 - product_overseer - INFO - Initializing MongoDB manager
+2025-06-21 21:33:40 - product_overseer - INFO - Successfully connected to MongoDB
+2025-06-21 21:33:40 - product_overseer - INFO - Initializing Regression managers
+2025-06-21 21:33:40 - product_overseer - INFO - Successfully initialized regression managers
+2025-06-21 21:33:40 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-06-21 21:33:40 - product_overseer - INFO - Email manager initialized
+2025-06-21 21:33:40 - product_overseer - INFO - Starting scraping and database update process
+2025-06-21 21:33:40 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds
+2025-06-21 21:40:53 - product_overseer - INFO - === Starting product overseer process ===
+2025-06-21 21:40:53 - product_overseer - INFO - Loading configuration files
+2025-06-21 21:40:54 - product_overseer - INFO - Running process for date: 2025_06_21
+2025-06-21 21:40:54 - product_overseer - INFO - Initializing managers
+2025-06-21 21:40:54 - product_overseer - INFO - Initializing Scraper manager
+2025-06-21 21:40:54 - product_overseer - INFO - Initializing MongoDB manager
+2025-06-21 21:40:54 - product_overseer - INFO - Successfully connected to MongoDB
+2025-06-21 21:40:54 - product_overseer - INFO - Initializing Regression managers
+2025-06-21 21:40:54 - product_overseer - INFO - Successfully initialized regression managers
+2025-06-21 21:40:54 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-06-21 21:40:54 - product_overseer - INFO - Email manager initialized
+2025-06-21 21:40:54 - product_overseer - INFO - Starting scraping and database update process
+2025-06-21 21:40:54 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds
+2025-06-21 21:43:04 - product_overseer - INFO - === Starting product overseer process ===
+2025-06-21 21:43:04 - product_overseer - INFO - Loading configuration files
+2025-06-21 21:43:04 - product_overseer - INFO - Running process for date: 2025_06_21
+2025-06-21 21:43:04 - product_overseer - INFO - Initializing managers
+2025-06-21 21:43:04 - product_overseer - INFO - Initializing Scraper manager
+2025-06-21 21:43:04 - product_overseer - INFO - Initializing MongoDB manager
+2025-06-21 21:43:04 - product_overseer - INFO - Successfully connected to MongoDB
+2025-06-21 21:43:04 - product_overseer - INFO - Initializing Regression managers
+2025-06-21 21:43:04 - product_overseer - INFO - Successfully initialized regression managers
+2025-06-21 21:43:04 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-06-21 21:43:05 - product_overseer - INFO - Email manager initialized
+2025-06-21 21:43:05 - product_overseer - INFO - Starting scraping and database update process
+2025-06-21 21:43:05 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds
+2025-06-21 21:44:50 - product_overseer - INFO - === Starting product overseer process ===
+2025-06-21 21:44:50 - product_overseer - INFO - Loading configuration files
+2025-06-21 21:44:50 - product_overseer - INFO - Running process for date: 2025_06_21
+2025-06-21 21:44:50 - product_overseer - INFO - Initializing managers
+2025-06-21 21:44:50 - product_overseer - INFO - Initializing Scraper manager
+2025-06-21 21:44:50 - product_overseer - INFO - Initializing MongoDB manager
+2025-06-21 21:44:50 - product_overseer - INFO - Successfully connected to MongoDB
+2025-06-21 21:44:50 - product_overseer - INFO - Initializing Regression managers
+2025-06-21 21:44:50 - product_overseer - INFO - Successfully initialized regression managers
+2025-06-21 21:44:50 - product_overseer - INFO - Initializing MailManager manager... This might take a while....
+2025-06-21 21:44:50 - product_overseer - INFO - Email manager initialized
+2025-06-21 21:44:50 - product_overseer - INFO - Starting scraping and database update process
+2025-06-21 21:44:50 - product_overseer - INFO - Starting scraping process with timeout: 21600 seconds

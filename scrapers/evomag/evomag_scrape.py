@@ -40,7 +40,7 @@ def create_driver():
 currentDate = datetime.datetime.now().strftime('%Y_%m_%d')
 
 config = configparser.ConfigParser()
-config.read('/home/tav/licenta_remastered/cfg.ini')
+config.read('/home/tav/Desktop/licenta/cfg.ini')
 
 latest_path = None
 
@@ -49,6 +49,7 @@ def no_nav_strings(iterable):
 
 def format_data(item,driver):
     try:
+        time.sleep(1.5)
         # driver.execute_script("Services.clearData.deleteData(Services.clearData.CLEAR_ALL);")
 
         #time.sleep(5)
@@ -194,7 +195,7 @@ def scrape(path: str):
     pagina_existenta = True
     while pagina_existenta:
         try:
-            time.sleep(1)
+            time.sleep(3)
             current_page += 1
             
             page_source = driver.page_source
