@@ -191,7 +191,7 @@ const HomeForm = () => {
   return (
     <div className="home-form">
       <div className="welcome-section">
-        <h1>Welcome to Product Price Tracker</h1>
+        <h1>Welcome to Product ProductJudge</h1>
         <p>Track prices, compare products, and get the best deals!</p>
       </div>
       
