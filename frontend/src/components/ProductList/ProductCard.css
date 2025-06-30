@@ -1,208 +1,293 @@
+/* --- Base Card Styles --- */
 .product-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 10px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: auto; /* Changed from fixed height to auto */
-    min-height: 200px; /* Added min-height instead of fixed height */
-    width: 100%;
-    box-sizing: border-box;
-    max-width: 100%;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .product-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 100%;
-    background-color: #ccc;
-  }
-  
-  .product-card.lower-price {
-    background-color: rgba(46, 125, 50, 0.05);
-    border-color: rgba(46, 125, 50, 0.2);
-  }
-  
-  .product-card.higher-price {
-    background-color: rgba(198, 40, 40, 0.05);
-    border-color: rgba(198, 40, 40, 0.2);
-  }
-  
-  .product-card.lower-price::after {
-    background-color: #4caf50;
-  }
-  
-  .product-card.higher-price::after {
-    background-color: #f44336;
-  }
-  
-  .product-card.lower-price .product-card-price {
-    color: #2e7d32;
-  }
-  
-  .product-card.higher-price .product-card-price {
-    color: #c62828;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  /* REMOVED padding: 10px; This is now handled by child elements. */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background-color: #ccc;
+  z-index: 2; /* Ensure it's above the image but below the hint/notification */
+}
+
+/* --- Price Comparison Variants --- */
+.product-card.lower-price {
+  background-color: rgba(46, 125, 50, 0.05);
+  border-color: rgba(46, 125, 50, 0.2);
+}
+
+.product-card.higher-price {
+  background-color: rgba(198, 40, 40, 0.05);
+  border-color: rgba(198, 40, 40, 0.2);
+}
+
+.product-card.lower-price::after {
+  background-color: #4caf50;
+}
+
+.product-card.higher-price::after {
+  background-color: #f44336;
+}
+
+.product-card.lower-price .product-card-price {
+  color: #2e7d32;
+}
+
+.product-card.higher-price .product-card-price {
+  color: #c62828;
+}
+
+/* --- NEW: Notification Area Styles --- */
+.product-card-notification-area {
+  padding: 8px 10px;
+  background-color: #f7f9fa;
+  border-bottom: 1px solid #eef2f5;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  /* IMPORTANT: Lift this area above the hover overlay */
+  position: relative; /* Create a stacking context */
+  z-index: 10;
+}
+
+.product-card-notification-area:hover {
+  background-color: #eef2f5;
+}
+
+.notification-label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.notification-label input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.notification-label-text {
+  margin-left: 8px;
+  user-select: none;
+}
+
+.custom-checkmark {
+  position: relative;
+  height: 16px;
+  width: 16px;
+  min-width: 16px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.notification-label:hover .custom-checkmark {
+  border-color: #999;
+}
+
+.notification-label input:checked ~ .custom-checkmark {
+  background-color: #1976d2; /* Match the price color */
+  border-color: #1976d2;
+}
+
+.custom-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.notification-label input:checked ~ .custom-checkmark:after {
+  display: block;
+}
+
+/* --- Main Content Styles --- */
+.product-card-image {
+  height: 80px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  overflow: hidden;
+  /* ADDED padding to replace parent's padding */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.product-card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover .product-card-image img {
+  transform: scale(1.05);
+}
+
+/* Group common elements to apply padding */
+.product-card-name,
+.product-card-info,
+.product-card-manufacturer {
+  width: 100%;
+  box-sizing: border-box;
+  /* ADDED horizontal padding to replace parent's padding */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.product-card-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 36px;
+  height: auto;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  padding-top: 10px; /* Add top padding */
+}
+
+.product-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  min-height: 20px;
+  height: auto;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.product-card-price,
+.product-card-stock {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card-price {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #1976d2;
+  max-width: 50%;
+}
+
+.product-card-stock {
+  font-size: 0.75rem;
+  border-radius: 3px;
+  padding: 1px 4px;
+  max-width: 45%;
+}
+
+.product-card-stock.in-stock {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.product-card-stock.out-of-stock {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.product-card-manufacturer {
+  font-size: 0.75rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 14px;
+  height: auto;
+  /* ADDED bottom padding to replace parent's padding */
+  padding-bottom: 10px; 
+}
+
+/* --- Hover Overlay Hint --- */
+.view-product-hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(25, 118, 210, 0.85);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  border-radius: 6px; /* Match parent's border-radius */
+  opacity: 0;
+  transition: opacity 0.2s;
+  /* IMPORTANT: Allow clicks to pass through to the card content below */
+  pointer-events: none; 
+  z-index: 5;
+}
+
+.product-card:hover .view-product-hint {
+  opacity: 1;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 600px) {
+  .product-card {
+    min-height: 170px;
   }
   
   .product-card-image {
-    height: 80px;
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  
-  .product-card-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.2s ease;
-  }
-  
-  .product-card:hover .product-card-image img {
-    transform: scale(1.05);
-  }
-  
-  .product-card-name,
-  .product-card-info,
-  .product-card-manufacturer {
-    width: 100%;
-    box-sizing: border-box;
+    height: 60px;
+    min-height: 60px;
   }
   
   .product-card-name {
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: #333;
-    /* Modified to allow more flexibility */
-    display: -webkit-box;
+    min-height: 18px;
     -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 36px; /* Changed from fixed height to min-height */
-    height: auto; /* Allow height to grow if needed */
-    margin-bottom: 6px;
-    line-height: 1.2; /* Added line height for better text rendering */
+    height: auto;
+    line-height: 1.2;
+    margin-bottom: 8px;
   }
   
   .product-card-info {
-    display: flex;
+    height: auto;
+    min-height: 30px;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
-    min-height: 20px; /* Changed from height to min-height */
-    height: auto; /* Allow auto height */
-    width: 100%;
-    flex-wrap: wrap; /* Allow wrapping if needed */
-    gap: 4px; /* Add gap between wrapped items */
+    gap: 4px;
   }
-  
-  .product-card-price,
-  .product-card-stock {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .product-card-price {
-    font-weight: bold;
-    font-size: 0.9rem;
-    color: #1976d2;
-    max-width: 50%;
-  }
-  
-  .product-card-stock {
-    font-size: 0.75rem;
-    border-radius: 3px;
-    padding: 1px 4px;
-    max-width: 45%;
-  }
-  
-  .product-card-stock.in-stock {
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-  }
-  
-  .product-card-stock.out-of-stock {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-  }
-  
-  .product-card-manufacturer {
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 14px; /* Changed from height to min-height */
-    height: auto; /* Allow auto height */
-  }
-  
-  .view-product-hint {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(25, 118, 210, 0.85);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 500;
-    border-radius: 6px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  
-  .product-card:hover .view-product-hint {
-    opacity: 1;
-  }
-  
-  /* Media queries for responsive design */
-  @media (max-width: 600px) {
-    .product-card {
-      min-height: 170px; /* Changed from height to min-height */
-    }
-    
-    .product-card-image {
-      height: 60px;
-      min-height: 60px;
-    }
-    
-    .product-card-name {
-      min-height: 18px; /* Changed from height to min-height */
-      -webkit-line-clamp: 2; /* Changed from 1 to 2 lines to show more of the title */
-      height: auto; /* Allow auto height */
-      line-height: 1.2; /* Added line height */
-      margin-bottom: 8px; /* Increased margin to provide more space */
-    }
-    
-    .product-card-info {
-      height: auto;
-      min-height: 30px;
-      flex-direction: row; /* Keep it as row for better layout */
-      flex-wrap: wrap; /* Allow wrapping on small screens */
-      justify-content: space-between;
-      align-items: center;
-      gap: 4px;
-    }
-  }
+}

@@ -12,7 +12,11 @@ const ProductCarousel = ({
   title,
   currentProductId,
   onProductClick,
-  getPriceComparisonClass
+  getPriceComparisonClass,
+  // --- NEW: Props to control and handle checkboxes on product cards ---
+  showCheckboxes = false,        // Set to true to show checkboxes
+  getCheckboxState = () => false, // Function to get a product's checked state by ID
+  onCheckboxToggle = () => {}     // Function to call when a checkbox is toggled
 }) => {
   const [allProducts, setAllProducts] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -88,7 +92,7 @@ const ProductCarousel = ({
               aria-label="Previous products"
               disabled={isTransitioning}
             >
-              &#8249;
+              ‹
             </button>
           )}
           
@@ -109,6 +113,10 @@ const ProductCarousel = ({
                     product={product}
                     priceComparisonClass={getPriceComparisonClass ? getPriceComparisonClass(product.price) : ''}
                     onClick={() => onProductClick(productId)}
+                    // --- NEW: Pass checkbox props down to the ProductCard ---
+                    showCheckbox={showCheckboxes}
+                    isCheckboxChecked={getCheckboxState(productId)}
+                    onCheckboxChange={() => onCheckboxToggle(product)} // Pass the whole product object up
                   />
                 );
               })}
@@ -122,7 +130,7 @@ const ProductCarousel = ({
               aria-label="Next products"
               disabled={isTransitioning}
             >
-              &#8250;
+              ›
             </button>
           )}
         </div>

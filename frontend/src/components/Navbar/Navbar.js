@@ -26,7 +26,7 @@ const Navbar = ({ isAuthenticated, handleLogout }) => {
         <div className="navbar-container">
           <div className="navbar-brand">
             <Link to="/" className="brand-link">
-              <span className="brand-text">DEMO Sesiune de comunicari</span>
+              <span className="brand-text">PriceJudge</span>
             </Link>
           </div>
           
