@@ -1,5 +1,7 @@
 import models from '../../models/index.mjs'
 
+// In your backend API file
+
 const insertIntoRecentProducts = async (req, res, next) => {
     try {
         const productCode = req.params.pcode;
@@ -17,35 +19,45 @@ const insertIntoRecentProducts = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Maximum number of recent products to store
         const MAX_RECENT_PRODUCTS = 30;
 
-        // Instead of modifying and saving req.user, use findOneAndUpdate with the $push operator
-        const result = await models.User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $pull: { recentProducts: { product_code: productCode } }
-            },
-            { new: true }
-        );
-
-        await models.User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $push: { 
-                    recentProducts: { 
-                        $each: [{ product_code: productCode }],
-                        $position: 0,
-                        $slice: MAX_RECENT_PRODUCTS
-                    } 
+        await models.User.updateOne(
+            { _id: req.user._id },
+            [
+                {
+                    $set: {
+                        // Step 1: Remove all existing occurrences of the product
+                        recentProducts: {
+                            $filter: {
+                                input: "$recentProducts",
+                                as: "item",
+                                cond: { $ne: ["$$item.product_code", productCode] }
+                            }
+                        }
+                    }
+                },
+                {
+                    $set: {
+                        // Step 2: Add the product to the beginning and slice the array
+                        recentProducts: {
+                            $slice: [
+                                {
+                                    $concatArrays: [
+                                        [{ product_code: productCode }],
+                                        "$recentProducts"
+                                    ]
+                                },
+                                MAX_RECENT_PRODUCTS
+                            ]
+                        }
+                    }
                 }
-            },
-            { new: true }
+            ]
         );
 
         return res.status(200).json({
             message: 'Product added to recent products',
-            product: product
+            product: product // You can keep returning the product if the frontend uses it
         });
     } catch (err) {
         next(err);
