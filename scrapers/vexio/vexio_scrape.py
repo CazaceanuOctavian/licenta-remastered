@@ -46,6 +46,7 @@ def no_nav_strings(iterable):
 def format_data(item):
     try:
         time.sleep(1)
+
         manufacturer = item.find_next(class_='manufacturer pull-left').text.strip().lower()
         name = item.find_next(class_='name').text.strip()
         isInStoc = item.find_next(class_=re.compile('availability margin-bottom-xs', re.IGNORECASE)).text.strip()
@@ -65,10 +66,12 @@ def format_data(item):
 
         driver.delete_all_cookies()
         driver.get(itemUrl)
+
+        # WAIT AT THE CORRECT TIME!
+    
+
         page_source = driver.page_source
         other_soup = BeautifulSoup(page_source, 'html.parser')
-
-        #WebDriverWait(driver, 2).until( EC.presence_of_all_elements_located )
 
         product_code = other_soup.find(class_='model').text.strip()
         product_code = product_code.replace('/','+rep+')
@@ -95,6 +98,8 @@ def format_data(item):
                 img_name = product_code + '.jpeg'
                 #
                 filepath = os.path.join(config['Paths']['image_output'], img_name) 
+                # filepath = os.path.join('image_test', img_name) 
+
                 with open(filepath, 'wb') as file:
                     file.write(img_data)
             except Exception as e:
@@ -148,6 +153,7 @@ def scrape(path : str):
     pagina_existenta = True
     while(pagina_existenta):
         time.sleep(1)
+        WebDriverWait(driver, 3).until( EC.presence_of_all_elements_located)
 
         current_page+=1
         page_source = driver.page_source
@@ -224,6 +230,7 @@ def main():
 
                 driver.delete_all_cookies()
                 path = path.strip()
+                print(f'Got path {path}')
 
                 if path is None:
                     continue

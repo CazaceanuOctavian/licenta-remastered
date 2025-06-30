@@ -133,6 +133,8 @@ def format_data(item,driver):
                 img_name = product_code + '.jpeg'
                 #
                 filepath = os.path.join(config['Paths']['image_output'], img_name) 
+                # filepath = os.path.join('image_test', img_name) 
+
                 with open(filepath, 'wb') as file:
                     file.write(img_data)
             except Exception as e:
@@ -196,6 +198,8 @@ def scrape(path: str):
     while pagina_existenta:
         try:
             time.sleep(3)
+            WebDriverWait(driver, 3).until( EC.presence_of_all_elements_located)
+
             current_page += 1
             
             page_source = driver.page_source
